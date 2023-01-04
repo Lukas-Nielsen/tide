@@ -7,6 +7,7 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: PHP Runner
         uses: franzliedke/gh-action-php@0.3.0
       - run: php8.1 import.php
