@@ -19,7 +19,7 @@ class import extends database
     {
         parent::__construct();
         $this->year = (int) date("m") === 12 ? (int) date("Y") + 1 : (int) date("Y");
-        if (!$this->query("CREATE TABLE IF NOT EXISTS tide (location integer, timestamp text, state text);")) {
+        if (!$this->query("CREATE TABLE tide IF NOT EXISTS (`location` smallint(3) UNSIGNED NOT NULL, `timestamp` text DEFAULT NULL, `state` enum('H','N') NOT NULL);")) {
             http_response_code(500);
             error_log("import.php error creating table");
             exit();
