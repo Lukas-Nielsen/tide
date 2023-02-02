@@ -8,20 +8,20 @@ class import extends database
 {
 
     protected int $year;
-    protected const CONF_URL = "https://raw.githubusercontent.com/Lukas-Nielsen/tide-import/main/location.json";
-    protected const DB_FILE = __DIR__ . "/tide.db";
+    protected const TOKEN = "";
     protected const INSERT = "INSERT INTO tide (location, timestamp, state) VALUES (:location, :timestamp, :state)";
     protected const DELETE = "DELETE FROM tide WHERE location = :location AND timestamp LIKE :year || '%'";
 
     /**
      * init import
-     * @param string $file path to db file
      */
     public function __construct()
     {
-        parent::__construct(self::DB_FILE);
+        parent::__construct();
         $this->year = (int) date("m") === 12 ? (int) date("Y") + 1 : (int) date("Y");
         if (!$this->query("CREATE TABLE IF NOT EXISTS tide (location integer, timestamp text, state text);")) {
+            http_response_code(500);
+            error_log("import.php error creating table");
             exit();
         }
     }
@@ -53,89 +53,71 @@ class import extends database
      */
     public function run()
     {
-        $conf = $this->get_conf();
-        if ($conf !== false) {
-            foreach ($conf as $location) {
-                $parsed = $this->get_parsed();
-                if ($parsed === false || !in_array($location["id"], $parsed)) {
-                    $this->query(self::DELETE, [
-                        "location" => $location["id"],
-                        "year" => $this->year
-                    ]);
-                    $data = $this->get_data($location["id"]);
-                    if ($data !== false) {
-                        foreach ($data as $row) {
-                            $row = explode("#", $row);
-                            if (sizeof($row) >= 12) {
-                                $this->query(self::INSERT, [
-                                    "location" => $location["id"],
-                                    "timestamp" => date("Y-m-d H:i", strtotime(str_replace(" ", "0", $row[5]) . " " . str_replace(" ", "0", $row[6]))),
-                                    "state" => $row[3]
-                                ]);
-                            }
-                        }
-                    }
+        if (empty($_SERVER["REQUEST_METHOD"]) || $_SERVER["REQUEST_METHOD"] !== "POST") {
+            http_response_code(405);
+            echo "method must be 'POST'";
+            exit();
+        }
+        if (empty(self::TOKEN)) {
+            error_log("import.php: please define a token");
+        }
+        if (empty($_SERVER["HTTP_X_TIDE_TOKEN"]) || empty(self::TOKEN) || $_SERVER["HTTP_X_TIDE_TOKEN"] !== self::TOKEN) {
+            http_response_code(400);
+            echo "token is missing or does not match";
+            exit();
+        }
+        if (!empty($_GET["location"]) && ctype_digit($_GET["location"])) {
+            $location = (int) $_GET["location"];
+        } else {
+            http_response_code(400);
+            echo "query parameter 'location' is missing or is not an integer";
+            exit();
+        }
+
+        if (
+            !$this->query(self::DELETE, [
+                "location" => $location,
+                "year" => $this->year
+            ])
+        ) {
+            error_log("error deleting data");
+        }
+
+        $data = $this->get_data();
+
+        if ($data !== false) {
+            foreach ($data as $entry) {
+                if (
+                    !$this->query(self::INSERT, [
+                        "location" => $location,
+                        "timestamp" => $entry["timestamp"],
+                        "state" => $entry["state"]
+                    ])
+                ) {
+                    error_log("error deleting data");
                 }
-                $parsed[] = $location["id"];
-                $this->put_parsed($parsed);
             }
+        } else {
+            http_response_code(400);
+            echo "no data given";
+            exit();
         }
     }
 
     /**
-     * get conf from github
-     * @return array|false
+     * get posted data
+     * @return false|array
      */
-    protected function get_conf(): array |bool
+    protected function get_data()
     {
-        $result = $this->request(self::CONF_URL);
-        if ($result !== false)
-            return json_decode($result, true);
-
-        return false;
-    }
-
-    /**
-     * get allready parsed locations
-     * @return array|false
-     */
-    protected function get_parsed(): array |bool
-    {
-        $file = __DIR__ . "/{$this->year}.json";
-        if (!file_exists($file)) {
+        $data = file_get_contents("php://input");
+        if ($data === false)
             return false;
-        }
-        return json_decode(file_get_contents($file), true);
 
-    }
-
-    /**
-     * update allready parsed locations
-     * @param array $data allready parsed locations
-     * @return array|false
-     */
-    protected function put_parsed(array $data): array |bool
-    {
-        try {
-            return file_put_contents(__DIR__ . "/{$this->year}.json", json_encode($data, JSON_PRETTY_PRINT));
-        } catch (\Throwable $th) {
-            $this->log("error putting parsed");
+        if (strlen($data) === 0)
             return false;
-        }
-    }
 
-    /**
-     * get data of given location
-     * @param int $location
-     * @return array|false
-     */
-    protected function get_data(int $location): array |bool
-    {
-        $result = $this->request("https://filebox.bsh.de/index.php/s/SbJ3z5NBkpOZloY/download?path=%2Fvb_hwnw%2Fdeu{$this->year}&files=DE__{$location}P{$this->year}.txt");
-        if ($result !== false)
-            return explode("\n", $result);
-
-        return false;
+        return json_decode($data, true);
     }
 }
 

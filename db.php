@@ -2,9 +2,13 @@
 
 namespace tide;
 
+define("DB_NAME", "");
+define("DB_HOST", "");
+define("DB_USER", "");
+define("DB_PASS", "");
+
 class database
 {
-    protected const LOG_FILE = __DIR__ . "/tide.log";
 
     protected \PDO $link;
 
@@ -15,27 +19,18 @@ class database
 
     /**
      * init db
-     * @param string $file path to db file
      */
-    public function __construct(string $file)
+    public function __construct()
     {
-        $this->link = new \PDO("sqlite:{$file}");
+        $this->link = new \PDO("mysql:dbname=" . DB_NAME . ";host=" . DB_HOST . ";charset=utf8mb4", DB_USER, DB_PASS);
         $this->link->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
         $this->link->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->link->exec("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
 
         if (mysqli_connect_errno()) {
-            $this->log("Problem with connecting to database.");
+            error_log("Problem with connecting to database.");
             exit(99);
         }
-    }
-
-    /**
-     * write log
-     * @param string $msg log message
-     */
-    public function log(string $msg)
-    {
-        error_log("{$msg}\n", 3, self::LOG_FILE);
     }
 
     /**
