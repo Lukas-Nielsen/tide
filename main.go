@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"strings"
 	"time"
@@ -14,6 +15,7 @@ import (
 type tide struct {
 	State     string `json:"state"`
 	Timestamp string `json:"timestamp"`
+	Height    string `json:"height"`
 }
 
 type conf struct {
@@ -25,6 +27,9 @@ var (
 	year         int
 	backendUrl   string
 	backendToken string
+	confFile     string
+	localConf    []conf
+	err          error
 )
 
 const (
@@ -36,22 +41,37 @@ const (
 func init() {
 	flag.StringVar(&backendUrl, "url", "", "")
 	flag.StringVar(&backendToken, "token", "", "")
+	flag.StringVar(&confFile, "file", "", "")
 	flag.Parse()
 	if len(backendUrl) == 0 || len(backendToken) == 0 {
-		log.Fatalln("please provide '--token' and '--url'")
+		log.Fatalln("please provide '--token' and '--url' optionaly: '--file'")
 	}
 
 	if time.Now().Month() == 12 {
-		year = int(time.Now().Month()) + 1
+		year = int(time.Now().Year()) + 1
 	} else {
 		year = time.Now().Year()
 	}
 }
 
 func main() {
-	localConf, err := getConf()
-	if err != nil {
-		log.Fatalln("error getting config: ", err)
+
+	if len(confFile) > 0 {
+		content, err := ioutil.ReadFile(confFile)
+		if err != nil {
+			log.Fatal("error when opening file: ", err)
+		}
+
+		err = json.Unmarshal(content, &localConf)
+		if err != nil {
+			log.Fatal("Error during Unmarshal(): ", err)
+		}
+	} else {
+
+		localConf, err = getConf()
+		if err != nil {
+			log.Fatalln("error getting config: ", err)
+		}
 	}
 
 	for _, location := range localConf {
@@ -76,6 +96,7 @@ func main() {
 					postData = append(postData, tide{
 						State:     rowArray[3],
 						Timestamp: timestamp.Format(DB_TIMESTAMP),
+						Height:    rowArray[7],
 					})
 				}
 			}
@@ -119,9 +140,6 @@ func (c *conf) getData() ([]string, error) {
 }
 
 func (c *conf) postData(data []tide) {
-
-	// temp, _ := json.Marshal(data)
-	// log.Println(string(temp))
 	client := resty.New()
 	resp, err := client.R().
 		SetHeader("x-tide-token", backendToken).

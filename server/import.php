@@ -9,8 +9,8 @@ class import extends database
 
     protected int $year;
     protected const TOKEN = "";
-    protected const INSERT = "INSERT INTO tide (location, timestamp, state) VALUES (:location, :timestamp, :state)";
-    protected const DELETE = "DELETE FROM tide WHERE location = :location AND timestamp LIKE :year || '%'";
+    protected const INSERT = "INSERT INTO tide (location, timestamp, state, height) VALUES (:location, :timestamp, :state, :height)";
+    protected const DELETE = "DELETE FROM tide WHERE location = :location AND timestamp LIKE CONCAT(:year, '%')";
 
     /**
      * init import
@@ -19,7 +19,7 @@ class import extends database
     {
         parent::__construct();
         $this->year = (int) date("m") === 12 ? (int) date("Y") + 1 : (int) date("Y");
-        if (!$this->query("CREATE TABLE tide IF NOT EXISTS (`location` smallint(3) UNSIGNED NOT NULL, `timestamp` text DEFAULT NULL, `state` enum('H','N') NOT NULL);")) {
+        if (!$this->query("CREATE TABLE tide IF NOT EXISTS (`location` smallint(3) UNSIGNED NOT NULL, `timestamp` timestamp DEFAULT NULL, `state` enum('H','N') NOT NULL, `height` float NOT NULL);")) {
             http_response_code(500);
             error_log("import.php error creating table");
             exit();
@@ -91,7 +91,8 @@ class import extends database
                     !$this->query(self::INSERT, [
                         "location" => $location,
                         "timestamp" => $entry["timestamp"],
-                        "state" => $entry["state"]
+                        "state" => $entry["state"],
+                        "height" => $entry["height"]
                     ])
                 ) {
                     error_log("error deleting data");

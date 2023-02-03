@@ -1,0 +1,30 @@
+table {
+    width: 100%;
+}
+
+.table-col-time {
+    width: 40%;
+    text-align: left;
+}
+
+.table-col-state {
+    width: 20%;
+    text-align: left;
+}
+
+.table-col-height {
+    width: 40%;
+    text-align: left;
+}
+
+.loading {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.settings {
+    display: flex;
+    gap: 1rem;
+}
