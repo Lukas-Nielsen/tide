@@ -199,6 +199,11 @@ const App = () => {
                         </Accordion>
                     );
                 })}
+            <span>
+                © {new Date().getFullYear()} by{' '}
+                <a href="https://chayns.de/lukas.nielsen">Lukas Nielsen</a> -
+                Daten vom <a href="https://www.bsh.de">BSH</a>
+            </span>
         </div>
     );
 };
