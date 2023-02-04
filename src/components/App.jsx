@@ -41,12 +41,16 @@ const App = () => {
     };
 
     const [data, setData] = useState([]);
-    const [displayDays, setDisplayDays] = useState(7);
+    const [displayDays, setDisplayDays] = useState(
+        JSON.parse(localStorage.getItem('tide-displayDays')) || 7
+    );
     const [loading, setLoading] = useState(true);
-    const [location, setLocation] = useState({
-        id: 635,
-        displayName: 'Dagebüll',
-    });
+    const [location, setLocation] = useState(
+        JSON.parse(localStorage.getItem('tide-location')) || {
+            id: 635,
+            displayName: 'Dagebüll',
+        }
+    );
 
     useEffect(() => {
         setLoading(true);
@@ -88,6 +92,14 @@ const App = () => {
                                     id: event.selection[0].id,
                                     displayName: event.selection[0].displayName,
                                 });
+                                localStorage.setItem(
+                                    'tide-location',
+                                    JSON.stringify({
+                                        id: event.selection[0].id,
+                                        displayName:
+                                            event.selection[0].displayName,
+                                    })
+                                );
                             }}
                             quickFind={true}
                         />
@@ -104,6 +116,10 @@ const App = () => {
                             defaultValue={displayDays}
                             onSelect={(event) => {
                                 setDisplayDays(event.selection[0].value);
+                                localStorage.setItem(
+                                    'tide-displayDays',
+                                    JSON.stringify(event.selection[0].value)
+                                );
                             }}
                         />
                     </div>
