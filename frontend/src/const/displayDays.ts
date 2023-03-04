@@ -1,32 +1,39 @@
-import { displayDaysType } from "../@types/displayDays";
+import { useLanguage } from "chayns-api";
+import { displayDaysDe } from "./language/de";
+import { displayDaysEn } from "./language/en";
+import { displayDaysEs } from "./language/es";
+import { displayDaysFr } from "./language/fr";
+import { displayDaysIt } from "./language/it";
+import { displayDaysNl } from "./language/nl";
+import { displayDaysPl } from "./language/pl";
+import { displayDaysPt } from "./language/pt";
+import { displayDaysTr } from "./language/tr";
+import { displayDaysUk } from "./language/uk";
 
-export const displayDays: displayDaysType[] = [
-	{
-		value: 1,
-		name: "1 Tag",
-	},
-	{
-		value: 3,
-		name: "3 Tage",
-	},
-	{
-		value: 5,
-		name: "5 Tage",
-	},
-	{
-		value: 7,
-		name: "1 Woche",
-	},
-	{
-		value: 14,
-		name: "2 Wochen",
-	},
-	{
-		value: 21,
-		name: "3 Wochen",
-	},
-	{
-		value: 28,
-		name: "4 Wochen",
-	},
-];
+export const useDisplayDays = () => {
+	const lang = useLanguage()?.active;
+	console.log(lang);
+	switch (lang) {
+		case "en":
+			return displayDaysEn;
+		case "nl":
+			return displayDaysNl;
+		case "it":
+			return displayDaysIt;
+		case "fr":
+			return displayDaysFr;
+		case "es":
+			return displayDaysEs;
+		case "pl":
+			return displayDaysPl;
+		case "pt":
+			return displayDaysPt;
+		case "tr":
+			return displayDaysTr;
+		case "uk":
+			return displayDaysUk;
+
+		default:
+			return displayDaysDe;
+	}
+};

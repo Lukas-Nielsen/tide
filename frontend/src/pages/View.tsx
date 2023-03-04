@@ -3,12 +3,14 @@ import { Accordion, SelectButton } from "chayns-components";
 import "./../index.css";
 import "./../css/View.css";
 import locations from "../location.json";
-import { displayDays } from "../const/displayDays";
-import { setWaitCursor, useCurrentPage, useSite } from "chayns-api";
-
-const locale = navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language;
+import { useDisplayDays } from "../const/displayDays";
+import { setWaitCursor, useCurrentPage, useLanguage, useSite } from "chayns-api";
+import { useTranslation } from "src/const/language";
 
 const View = () => {
+	const translation = useTranslation();
+	const displayDays = useDisplayDays();
+
 	type stateType = {
 		[key: string]: string;
 	};
@@ -24,8 +26,12 @@ const View = () => {
 		N: "NW",
 	};
 
+	const locale = useLanguage().active;
+
 	const [data, setData] = useState<dataType[][]>();
-	const [dayCount, setDayCount] = useState<number | undefined>(JSON.parse(localStorage.getItem("tide-dayCount") || "7"));
+	const [dayCount, setDayCount] = useState<number | undefined>(
+		JSON.parse(localStorage.getItem("tide-dayCount") || "7")
+	);
 	const [isLoading, setIsLoading] = useState(true);
 	const [interactive, setInteractive] = useState(true);
 	const [locationList, setLocationList] = useState<number[]>([]);
@@ -38,7 +44,10 @@ const View = () => {
 				})
 		).id
 	);
-	const [location, setLocation] = useState<{ id: number; displayName: string }>(
+	const [location, setLocation] = useState<{
+		id: number;
+		displayName: string;
+	}>(
 		JSON.parse(
 			localStorage.getItem("tide-location") ||
 				JSON.stringify({
@@ -73,7 +82,12 @@ const View = () => {
 					} else if ("interactive" in data && data.interactive) {
 						if ("location" in data) setLocationList(data.location);
 						if (data.location.indexOf(locationId) === -1) {
-							setLocation(locations.find((entry) => data.location.indexOf(entry.id) !== -1) || { id: 635, displayName: "Dagebüll" });
+							setLocation(
+								locations.find((entry) => data.location.indexOf(entry.id) !== -1) || {
+									id: 635,
+									displayName: "Dagebüll",
+								}
+							);
 						}
 					}
 					if ("days" in data && data.days !== null) setDayCount(data.days);
@@ -106,12 +120,16 @@ const View = () => {
 		<div>
 			{!isLoading && interactive && (
 				<>
-					<h1>Parameter</h1>
+					<h1>{translation.view.paramter}</h1>
 					<div className="settings">
 						<SelectButton
 							label={location.displayName}
-							title={"wähle einen Ort"}
-							list={locationList.length > 0 ? locations.filter((entry) => locationList.indexOf(entry.id) !== -1) : locations}
+							title={translation.view.chooseLocation}
+							list={
+								locationList.length > 0
+									? locations.filter((entry) => locationList.indexOf(entry.id) !== -1)
+									: locations
+							}
 							listKey={"id"}
 							listValue={"displayName"}
 							defaultValue={location.id}
@@ -132,7 +150,7 @@ const View = () => {
 						/>
 						<SelectButton
 							label={displayDays.find((entry) => entry.value === dayCount)?.name}
-							title={"Tage zum Anzeigen"}
+							title={translation.view.daysToShow}
 							list={displayDays}
 							listKey={"value"}
 							listValue={"name"}
@@ -145,8 +163,12 @@ const View = () => {
 					</div>
 				</>
 			)}
-			{!isLoading && data && <h1>Gezeiten - {location.displayName}</h1>}
-			{!isLoading && !data && <h3>Fehler</h3>}
+			{!isLoading && data && (
+				<h1>
+					{translation.general.tide} - {location.displayName}
+				</h1>
+			)}
+			{!isLoading && !data && <h3>{translation.general.error}</h3>}
 			{!isLoading &&
 				interactive &&
 				data?.map((day, index) => {
@@ -166,8 +188,8 @@ const View = () => {
 							<table>
 								<thead>
 									<tr>
-										<th className="table-col-time">Uhrzeit</th>
-										<th className="table-col-height">Wasserstand</th>
+										<th className="table-col-time">{translation.view.time}</th>
+										<th className="table-col-height">{translation.view.waterLevel}</th>
 										<th className="table-col-state">&nbsp;</th>
 									</tr>
 								</thead>
@@ -183,7 +205,7 @@ const View = () => {
 													})}
 												</td>
 												<td>
-													{event.height === 0 && "unbekannt"}
+													{event.height === 0 && translation.view.unknown}
 													{event.height !== 0 && event.height.toFixed(2) + "m"}
 												</td>
 												<td>{states[event.state]}</td>
@@ -213,8 +235,8 @@ const View = () => {
 							<table className="chayns__background-color--100 not-interactive">
 								<thead>
 									<tr>
-										<th className="table-col-time">Uhrzeit</th>
-										<th className="table-col-height">Wasserstand</th>
+										<th className="table-col-time">{translation.view.time}</th>
+										<th className="table-col-height">{translation.view.waterLevel}</th>
 										<th className="table-col-state">&nbsp;</th>
 									</tr>
 								</thead>
@@ -230,7 +252,7 @@ const View = () => {
 													})}
 												</td>
 												<td>
-													{event.height === 0 && "unbekannt"}
+													{event.height === 0 && translation.view.unknown}
 													{event.height !== 0 && event.height.toFixed(2) + "m"}
 												</td>
 												<td>{states[event.state]}</td>

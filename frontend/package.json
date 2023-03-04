@@ -2,7 +2,7 @@
 	"name": "tide",
 	"version": "0.1.0",
 	"private": true,
-	"homepage": "/ui",
+	"homepage": ".",
 	"dependencies": {
 		"chayns-api": "^1.0.11",
 		"chayns-components": "^4.27.3",
@@ -20,6 +20,13 @@
 		"extends": [
 			"react-app"
 		]
+	},
+	"prettier": {
+		"jsxSingleQuote": false,
+		"useTabs": true,
+		"tabWidth": 4,
+		"endOfLine": "lf",
+		"printWidth": 120
 	},
 	"browserslist": {
 		"production": [

@@ -21,9 +21,9 @@ jobs:
                 npm ci
                 npm run build
             - name: Zip Frontend
-              run: zip -r ./frontend.zip ./frontend/build
+              run: (cd ./frontend/build && zip -q -r - .) > frontend.zip
             - name: Zip Backend
-              run: zip -r ./backend.zip ./backend
+              run: (cd ./backend && zip -q -r - .) > backend.zip
             - name: Release
               uses: softprops/action-gh-release@v1
               if: startsWith(github.ref, 'refs/tags/')
