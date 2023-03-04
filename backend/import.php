@@ -6,11 +6,11 @@ require_once(__DIR__ . "/db.php");
 
 class import extends database
 {
-
     protected int $year;
     protected const TOKEN = "";
     protected const INSERT = "INSERT INTO tide (location, timestamp, state, height) VALUES (:location, :timestamp, :state, :height)";
     protected const DELETE = "DELETE FROM tide WHERE location = :location AND timestamp LIKE CONCAT(:year, '%')";
+    protected const CREATE = "CREATE TABLE IF NOT EXISTS tide (`location` smallint(3) UNSIGNED NOT NULL, `timestamp` timestamp DEFAULT NULL, `state` enum('H','N') NOT NULL, `height` float NOT NULL);";
 
     /**
      * init import
@@ -19,7 +19,7 @@ class import extends database
     {
         parent::__construct();
         $this->year = (int) date("m") === 12 ? (int) date("Y") + 1 : (int) date("Y");
-        if (!$this->query("CREATE TABLE tide IF NOT EXISTS (`location` smallint(3) UNSIGNED NOT NULL, `timestamp` timestamp DEFAULT NULL, `state` enum('H','N') NOT NULL, `height` float NOT NULL);")) {
+        if (!$this->query(self::CREATE)) {
             http_response_code(500);
             error_log("import.php error creating table");
             exit();

@@ -1,0 +1,15 @@
+.loading {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	margin-top: 2rem;
+}
+
+.hidden {
+	display: none;
+}
+
+.flex {
+	display: flex;
+	gap: 1rem;
+}
