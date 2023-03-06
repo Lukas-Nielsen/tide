@@ -12,7 +12,6 @@ import { displayDaysUk } from "./language/uk";
 
 export const useDisplayDays = () => {
 	const lang = useLanguage()?.active;
-	console.log(lang);
 	switch (lang) {
 		case "en":
 			return displayDaysEn;

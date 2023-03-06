@@ -29,11 +29,10 @@ const View = () => {
 	const locale = useLanguage().active;
 
 	const [data, setData] = useState<dataType[][]>();
-	const [dayCount, setDayCount] = useState<number | undefined>(
-		JSON.parse(localStorage.getItem("tide-dayCount") || "7")
-	);
+	const [dayCount, setDayCount] = useState<number | undefined>();
 	const [isLoading, setIsLoading] = useState(true);
 	const [interactive, setInteractive] = useState(true);
+	const [fontSize, setFontSize] = useState("1");
 	const [locationList, setLocationList] = useState<number[]>([]);
 	const [locationId] = useState<number>(
 		JSON.parse(
@@ -79,6 +78,7 @@ const View = () => {
 							id: data.location[0],
 							displayName: locations.find((entry) => entry.id === data.location[0])?.displayName || "",
 						});
+						if ("fontSize" in data) setFontSize(data.fontSize);
 					} else if ("interactive" in data && data.interactive) {
 						if ("location" in data) setLocationList(data.location);
 						if (data.location.indexOf(locationId) === -1) {
@@ -100,12 +100,12 @@ const View = () => {
 	useEffect(() => {
 		setIsLoading(true);
 		if (location && dayCount) {
-			fetch(`https://tide.lukasnielsen.de/api/serve.php?location=` + location.id)
+			fetch(`https://tide.lukasnielsen.de/api/serve.php?location=${location.id}&days=${dayCount}`)
 				.then((response) => {
 					return response.json();
 				})
 				.then((actualData) => {
-					setData(actualData.slice(0, dayCount));
+					setData(actualData);
 				})
 				.catch(() => {
 					setData(undefined);
@@ -114,6 +114,8 @@ const View = () => {
 					setIsLoading(false);
 				});
 		}
+
+		if (!dayCount) setDayCount(7);
 	}, [location, dayCount]);
 
 	return (
@@ -164,7 +166,7 @@ const View = () => {
 				</>
 			)}
 			{!isLoading && data && (
-				<h1>
+				<h1 className={!interactive ? "font-size font-size--" + fontSize : ""}>
 					{translation.general.tide} - {location.displayName}
 				</h1>
 			)}
@@ -223,7 +225,7 @@ const View = () => {
 				data?.map((day, index) => {
 					let date = new Date(day[0].timestamp);
 					return (
-						<div key={day[0].timestamp}>
+						<div key={day[0].timestamp} className={"font-size font-size--" + fontSize}>
 							<h2>
 								{date.toLocaleDateString(locale, {
 									weekday: "long",

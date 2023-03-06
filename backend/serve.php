@@ -8,6 +8,10 @@ if (empty($_GET["location"]))
 
 $location = $_GET["location"];
 
+$days = 7;
+if (!empty($_GET["days"]))
+    $days = (int) $_GET["days"];
+
 header("Content-Type: application/json");
 
 require_once("./db.php");
@@ -40,7 +44,7 @@ if ($data !== false) {
         ];
     }
 
-    echo json_encode(array_values($callback));
+    echo json_encode(array_slice(array_values($callback), 0, $days));
 } else {
     http_response_code(404);
 }

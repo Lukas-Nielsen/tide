@@ -23,3 +23,9 @@
 	width: 10rem;
 	max-width: 100%;
 }
+
+.font-size--select {
+	display: block;
+	margin: 1rem 1rem;
+	width: 8rem;
+}
