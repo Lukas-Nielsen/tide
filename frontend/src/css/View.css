@@ -1,5 +1,11 @@
-table {
+.container {
+	background: var(--chayns-color--secondary-100);
+}
+
+table,
+.container > h2 {
 	width: 100%;
+	padding: 0.6rem;
 }
 
 .table-col-time {

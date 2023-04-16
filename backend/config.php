@@ -11,19 +11,24 @@ header("Content-Type: application/json");
 class config extends database
 {
     protected const DECLARE_CONFIG = "SET @config = :config;";
-    protected const INSERT_UPDATE = "INSERT INTO tide__config (siteId, tappId, config) VALUES (:siteId, :tappId, @config) ON DUPLICATE KEY UPDATE config=@config;";
-    protected const SELECT = "SELECT config FROM tide__config WHERE siteId = :siteId AND tappId = :tappId;";
-    protected const CREATE = "CREATE TABLE IF NOT EXISTS tide__config (`siteId` varchar(11) NOT NULL, `tappId` mediumint(7) DEFAULT NULL, `config` json NOT NULL, UNIQUE(`siteId`, `tappId`));";
+    protected const INSERT_UPDATE = "INSERT INTO tide__config (siteId, deviceId, config) VALUES (:siteId, :deviceId, @config) ON DUPLICATE KEY UPDATE config=@config;";
+    protected const SELECT_SINGLE = "SELECT config FROM tide__config WHERE siteId = :siteId AND deviceId = :deviceId;";
+    protected const SELECT_ALL = "SELECT config, deviceId FROM tide__config WHERE siteId = :siteId";
+    protected const DELETE = "DELETE FROM tide__config WHERE siteId = :siteId AND deviceId = :deviceId";
+    protected const CREATE = "CREATE TABLE IF NOT EXISTS tide__config (`siteId` varchar(11) NOT NULL, `deviceId` varchar(20) NOT NULL, `config` json DEFAULT NULL, UNIQUE(`siteId`, `deviceId`));";
+
+    protected string $deviceId;
+    protected string $siteId;
 
     /**
-     * init import
+     * init config
      */
     public function __construct()
     {
         parent::__construct();
         if (!$this->query(self::CREATE)) {
             http_response_code(500);
-            error_log("import.php error creating table");
+            error_log("config.php error creating table");
             exit();
         }
     }
@@ -54,71 +59,153 @@ class config extends database
     }
 
     /**
-     * run the import
+     * handle request
      */
-    public function run()
+    public function handle_request()
     {
-        if (empty($_SERVER["REQUEST_METHOD"]) || !in_array($_SERVER["REQUEST_METHOD"], ["PUT", "GET"])) {
-            http_response_code(405);
-            echo json_encode("method must be 'GET' or 'PUT'");
-            exit();
-        }
-
-        if (empty($_GET["siteId"]) || empty($_GET["tappId"])) {
+        if (empty($_GET["siteId"]) || empty($_GET["deviceId"])) {
             http_response_code(400);
-            echo json_encode("missing paramter 'siteId' or 'tappId'");
+            echo json_encode("missing paramter 'siteId' or 'deviceId'");
             exit(0);
         }
 
-        $siteId = $_GET["siteId"];
-        $tappId = $_GET["tappId"];
+        $this->siteId = $_GET["siteId"];
+        $this->deviceId = $_GET["deviceId"];
 
-        if ($_SERVER["REQUEST_METHOD"] === "GET") {
-            $data = $this->fetch_assoc(self::SELECT, ["siteId" => $siteId, "tappId" => $tappId]);
+        switch ($_SERVER["REQUEST_METHOD"]) {
+            case "GET":
+                $this->handle_get();
+                break;
+            case "PUT":
+                $this->handle_put();
+                break;
+            case "DELETE":
+                $this->handle_delete();
+                break;
+
+            default:
+                http_response_code(405);
+                echo json_encode("method not allowed");
+                exit();
+        }
+    }
+
+    /**
+     * handle get
+     * @return void
+     */
+    protected function handle_get()
+    {
+        if ($this->deviceId === "all") {
+            $data = $this->fetch_assoc_array(self::SELECT_ALL, ["siteId" => $this->siteId]);
             if ($data !== false) {
-                echo $data["config"];
+                $callback = [];
+                foreach ($data as $row) {
+                    if ($row["config"] !== null) {
+                        $callback[] = json_decode($row["config"], true);
+                    } else {
+                        $callback[] = [
+                            "deviceId" => $row["deviceId"],
+                            "fontSize" => 1,
+                            "name" => "",
+                            "location" => 635
+                        ];
+                    }
+                }
+
+                echo json_encode($callback);
                 exit(0);
             }
             http_response_code(404);
             echo json_encode("no config saved");
             exit(0);
-        }
-
-        if ($_SERVER["REQUEST_METHOD"] === "PUT") {
-            if (empty($_GET["locationId"])) {
-                http_response_code(400);
-                echo json_encode("missing parameter 'locationId'");
+        } else {
+            $data = $this->fetch_assoc(self::SELECT_SINGLE, ["siteId" => $this->siteId, "deviceId" => $this->deviceId]);
+            if ($data !== false && $data["config"] !== null) {
+                echo $data["config"];
                 exit(0);
             }
-            $locationId = $_GET["locationId"];
-            if (!empty($_SERVER["HTTP_X_CHAYNS_TOKEN"])) {
-                $chaynsToken = $_SERVER["HTTP_X_CHAYNS_TOKEN"];
-                if ($this->validate_user($chaynsToken, $locationId)) {
-                    $data = $this->get_data();
-                    if ($data !== false) {
-                        if ($this->query(self::DECLARE_CONFIG, ["config" => $data])) {
-                            if ($this->query(self::INSERT_UPDATE, ["siteId" => $siteId, "tappId" => $tappId])) {
-                                exit(0);
-                            }
+            if ($this->query(self::DECLARE_CONFIG, ["config" => null])) {
+                $this->query(self::INSERT_UPDATE, ["siteId" => $this->siteId, "deviceId" => $this->deviceId]);
+            }
+            http_response_code(404);
+            echo json_encode("no config saved");
+            exit(0);
+        }
+    }
+
+    /**
+     * handle put
+     * @return void
+     */
+    protected function handle_put()
+    {
+        if (empty($_GET["locationId"])) {
+            http_response_code(400);
+            echo json_encode("missing parameter 'locationId'");
+            exit(0);
+        }
+        $locationId = $_GET["locationId"];
+        if (!empty($_SERVER["HTTP_X_CHAYNS_TOKEN"])) {
+            $chaynsToken = $_SERVER["HTTP_X_CHAYNS_TOKEN"];
+            if ($this->validate_user($chaynsToken, $locationId)) {
+                $data = $this->get_data();
+                if ($data !== false) {
+                    if ($this->query(self::DECLARE_CONFIG, ["config" => $data])) {
+                        if ($this->query(self::INSERT_UPDATE, ["siteId" => $this->siteId, "deviceId" => $this->deviceId])) {
+                            exit(0);
                         }
-                        http_response_code(500);
-                        echo json_encode("error setting config");
-                        exit(0);
-                    } else {
-                        http_response_code(400);
-                        echo json_encode("error in given config");
-                        exit(0);
                     }
+                    http_response_code(500);
+                    echo json_encode("error setting config");
+                    exit(0);
                 } else {
-                    http_response_code(403);
-                    echo json_encode("you have no permission to change the config");
+                    http_response_code(400);
+                    echo json_encode("error in given config");
                     exit(0);
                 }
             } else {
-                http_response_code(401);
-                echo json_encode("header 'x-chayns-token' is missing");
+                http_response_code(403);
+                echo json_encode("you have no permission to change the config");
                 exit(0);
             }
+        } else {
+            http_response_code(401);
+            echo json_encode("header 'x-chayns-token' is missing");
+            exit(0);
+        }
+    }
+
+    /**
+     * handle delete
+     * @return void
+     */
+    protected function handle_delete()
+    {
+        if (empty($_GET["locationId"])) {
+            http_response_code(400);
+            echo json_encode("missing parameter 'locationId'");
+            exit(0);
+        }
+        $locationId = $_GET["locationId"];
+        if (!empty($_SERVER["HTTP_X_CHAYNS_TOKEN"])) {
+            $chaynsToken = $_SERVER["HTTP_X_CHAYNS_TOKEN"];
+            if ($this->validate_user($chaynsToken, $locationId)) {
+                if ($this->query(self::DELETE, ["siteId" => $this->siteId, "deviceId" => $this->deviceId])) {
+                    exit(0);
+                }
+                http_response_code(500);
+                echo json_encode("error removing device");
+                exit(0);
+            } else {
+                http_response_code(403);
+                echo json_encode("you have no permission to change the config");
+                exit(0);
+            }
+        } else {
+            http_response_code(401);
+            echo json_encode("header 'x-chayns-token' is missing");
+            exit(0);
         }
     }
 
@@ -139,4 +226,4 @@ class config extends database
     }
 }
 
-(new config())->run();
+(new config())->handle_request();

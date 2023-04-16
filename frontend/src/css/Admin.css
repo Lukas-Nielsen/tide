@@ -1,31 +1,12 @@
-.location--filter {
-	width: calc(100% - 1rem) !important;
-	margin: 0.5rem;
-}
-
-.location--wrapper,
-.interactive--wrapper {
-	list-style: none;
-	padding: 0 1rem;
-	max-height: 10rem;
-	overflow-y: auto;
-}
-
-.save {
+.delete {
 	display: block;
 	margin: 1rem auto;
 	width: 8rem;
 }
 
-.only-selected {
-	margin-left: 0.5rem;
-	margin-right: 0.5rem;
-	width: 10rem;
-	max-width: 100%;
-}
-
-.font-size--select {
-	display: block;
-	margin: 1rem 1rem;
-	width: 8rem;
+.admin--config--wrapper {
+	margin: 0.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
 }

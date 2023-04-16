@@ -1,4 +1,4 @@
-export type displayDaysType = {
+export interface DisplayDays {
     value: number
     name: string
 }

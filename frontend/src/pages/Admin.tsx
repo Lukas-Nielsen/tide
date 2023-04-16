@@ -3,221 +3,180 @@ import { Accordion, Button, Input, SelectButton } from "chayns-components";
 import "./../index.css";
 import "./../css/Admin.css";
 import locations from "../location.json";
-import { setWaitCursor, useAccessToken, useCurrentPage, useSite } from "chayns-api";
+import { DialogType, createDialog, setWaitCursor, useAccessToken, useSite } from "chayns-api";
+import { Config } from "src/@types/config";
+import { displayDays } from "src/const/displayDays";
 import { fontSize } from "src/const/fontSize";
+import { DisplayDays } from "src/@types/displayDays";
+import { Location } from "src/@types/location";
 
 const Admin = () => {
-	const [filterValue, setFilterValue] = useState("");
-	const [onlySelected, setOnlySelected] = useState(false);
-	const [interactive, setInteractive] = useState(true);
-	const [locationList, setLocationList] = useState<number[]>([]);
-	const [fontSizeValue, setFontSizeValue] = useState<string>("1");
-	const [days, setDays] = useState<number | string>(1);
+	const [config, setConfig] = useState<Config[]>();
 	const [isLoading, setIsLoading] = useState(true);
 
-	const site = useSite();
-	const tapp = useCurrentPage();
+	const siteId = useSite().id;
+	const locationId = useSite().locationId;
 	const accessToken = useAccessToken();
+
+	const updateValue = (
+		deviceId: string,
+		valueType: "dayCount" | "location" | "fontSize" | "name",
+		value: number | string
+	) => {
+		if (config) {
+			let temp = [...config];
+			let index = temp.findIndex((entry) => entry.deviceId === deviceId);
+			if (index > -1) {
+				if (typeof value === "number") {
+					switch (valueType) {
+						case "dayCount":
+							temp[index].dayCount = value;
+							break;
+
+						case "location":
+							temp[index].location = value;
+							break;
+
+						case "fontSize":
+							temp[index].fontSize = value;
+							break;
+					}
+				} else if (typeof value === "string" && valueType === "name") {
+					temp[index].name = value;
+				}
+			}
+			setConfig(temp);
+		}
+	};
 
 	setWaitCursor({ isEnabled: isLoading });
 
 	useEffect(() => {
-		if (site.originSiteId && tapp.id) {
-			fetch(`https://tide.lukasnielsen.de/api/config.php?siteId=${site.originSiteId}&tappId=${tapp.id}`)
+		if (siteId && isLoading) {
+			fetch(`https://tide.chayns.friesendev.de/api/config.php?siteId=${siteId}&deviceId=all`)
 				.then((resp) => {
 					if (resp.status === 200) {
 						return resp.json();
-					} else {
-						return { interactive: true, location: [], days: 1 };
 					}
+					return undefined;
 				})
 				.then((data) => {
-					if ("interactive" in data) setInteractive(data.interactive);
-					if ("location" in data) setLocationList(data.location);
-					if ("days" in data && data.days !== null) setDays(data.days);
-					if ("fontSize" in data) setFontSizeValue(data.fontSize);
+					setConfig(data);
 				})
 				.catch()
 				.finally(() => setIsLoading(false));
 		}
-	}, [site, tapp]);
+	}, [siteId, isLoading]);
 
-	const save = () => {
-		const config = {
-			interactive: interactive,
-			location: locationList,
-			fontSize: fontSizeValue,
-			days: interactive ? null : days < 1 ? 1 : typeof days === "number" ? days : parseInt(days),
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			if (siteId && config && accessToken && locationId) {
+				config.forEach((device) => {
+					fetch(
+						`https://tide.chayns.friesendev.de/api/config.php?siteId=${siteId}&deviceId=${device.deviceId}&locationId=${locationId}`,
+						{ headers: { "x-chayns-token": accessToken }, body: JSON.stringify(device), method: "PUT" }
+					);
+				});
+			}
+		}, 5 * 1000);
+		return () => {
+			clearTimeout(timeout);
 		};
-		if (site.originSiteId && tapp.id && site.locationId && accessToken) {
-			fetch(
-				`https://tide.lukasnielsen.de/api/config.php?siteId=${site.originSiteId}&tappId=${tapp.id}&locationId=${site.locationId}`,
-				{ headers: { "x-chayns-token": accessToken }, body: JSON.stringify(config), method: "PUT" }
-			);
-		}
-	};
+	}, [config, siteId, accessToken, locationId]);
 
-	const updateOnlySelected = () => {
-		setOnlySelected(!onlySelected);
+	const deleteDevice = (deviceId: string) => {
+		if (siteId && accessToken) {
+			fetch(
+				`https://tide.chayns.friesendev.de/api/config.php?siteId=${siteId}&deviceId=${deviceId}&locationId=${locationId}`,
+				{ headers: { "x-chayns-token": accessToken }, method: "DELETE" }
+			).finally(() => {
+				setIsLoading(true);
+			});
+		}
 	};
 
 	return (
 		<>
-			{!isLoading && (
+			{config && (
 				<>
-					<Accordion head="Ansichtsmodus" dataGroup="config" defaultOpened>
-						<ul className="interactive--wrapper">
-							<li>
-								<label className="flex">
-									<input
-										type="radio"
-										name="interactive"
-										checked={interactive}
-										onChange={() => {
-											setInteractive(!interactive);
-											setLocationList([]);
-										}}
-									/>
-									<span>Web / App</span>
-								</label>
-							</li>
-							<li>
-								<label className="flex">
-									<input
-										type="radio"
-										name="interactive"
-										checked={!interactive}
-										onChange={() => {
-											setInteractive(!interactive);
-											setLocationList([]);
-										}}
-									/>
-									<span>Infotafel</span>
-								</label>
-							</li>
-						</ul>
-					</Accordion>
-					{interactive && (
-						<Accordion head="Standorte" dataGroup="config">
-							<div>
-								<Input
-									placeholder="Dagebüll"
-									onChange={setFilterValue}
-									defaultValue={filterValue}
-									className="location--filter"
-								/>
-								<Button className="only-selected" onClick={updateOnlySelected}>
-									{onlySelected && "nur ausgewählte"}
-									{!onlySelected && "alle"}
-								</Button>
-								<ul className="location--wrapper">
-									{locations.map((location) => {
-										return (
-											<li
-												key={location.id}
-												className={
-													onlySelected
-														? locationList.indexOf(location.id) !== -1
-															? ""
-															: " hidden"
-														: location.displayName
-																.toLowerCase()
-																.indexOf(filterValue.toLowerCase()) !== -1
-														? ""
-														: " hidden"
-												}
-											>
-												<label className="flex">
-													<input
-														type="checkbox"
-														checked={locationList.indexOf(location.id) !== -1}
-														onChange={(e) => {
-															if (e.target.checked) {
-																setLocationList([location.id, ...locationList]);
-															} else {
-																setLocationList(
-																	locationList.filter(
-																		(entry) => entry !== location.id
-																	)
-																);
-															}
-														}}
-													/>
-													<span>{location.displayName}</span>
-												</label>
-											</li>
-										);
-									})}
-								</ul>
-							</div>
-						</Accordion>
-					)}
-					{!interactive && (
-						<Accordion head="Standorte" dataGroup="config">
-							<div>
-								<Input
-									placeholder="Dagebüll"
-									onChange={setFilterValue}
-									value={filterValue}
-									className="location--filter"
-								/>
-								<ul className="location--wrapper">
-									{locations.map((location) => {
-										return (
-											<li
-												key={location.id}
-												className={
-													location.displayName
-														.toLowerCase()
-														.indexOf(filterValue.toLowerCase()) !== -1
-														? ""
-														: " hidden"
-												}
-											>
-												<label className="flex">
-													<input
-														type="radio"
-														name="location"
-														checked={locationList.indexOf(location.id) !== -1}
-														onChange={() => setLocationList([location.id])}
-													/>
-													<span>{location.displayName}</span>
-												</label>
-											</li>
-										);
-									})}
-								</ul>
-							</div>
-						</Accordion>
-					)}
-					{!interactive && (
-						<Accordion head="Tage zum Anzeigen" dataGroup="config">
-							<div>
-								<Input placeholder="2" type="number" onChange={setDays} value={days} className="days" />
-							</div>
-						</Accordion>
-					)}
-					{!interactive && (
-						<Accordion head="Schriftgröße" dataGroup="config">
-							<div>
-								<SelectButton
-									label={fontSizeValue}
-									title="Schriftgröße"
-									list={fontSize}
-									defaultValue={fontSize}
-									listKey={"value"}
-									listValue={"value"}
-									onSelect={(event: any) => {
-										setFontSizeValue(event.selection[0].value);
-									}}
-									className="font-size--select"
-								/>
-							</div>
-						</Accordion>
-					)}
-					<Button className="save" onClick={save}>
-						speichern
-					</Button>
+					{config?.map((device, index) => {
+						return (
+							<Accordion
+								key={device.deviceId}
+								head={device.name.length === 0 ? device.deviceId : device.name}
+								dataGroup="config"
+								defaultOpened={index === 0}
+							>
+								<div className="admin--config--wrapper">
+									<div>
+										<h3>Name</h3>
+										<Input
+											onChange={(e) => {
+												updateValue(device.deviceId, "name", e);
+											}}
+											value={device.name}
+											placeholder="Name"
+										/>
+									</div>
+									<div>
+										<h3>Tage zum Anzeigen</h3>
+										<SelectButton
+											label={
+												displayDays.find((entry) => entry.value === device.dayCount)?.name ||
+												"bitte wählen"
+											}
+											title="Tage zum anzeigen"
+											list={displayDays}
+											listKey={"value"}
+											listValue={"name"}
+											onSelect={(data: { buttonType: number; selection: DisplayDays[] }) => {
+												updateValue(device.deviceId, "dayCount", data.selection[0].value);
+											}}
+										/>
+									</div>
+									<div>
+										<h3>Ort</h3>
+										<SelectButton
+											label={
+												locations.find((entry) => entry.id === device.location)?.displayName ||
+												"bitte wählen"
+											}
+											title="wähle einen Ort"
+											list={locations}
+											listKey={"id"}
+											listValue={"displayName"}
+											onSelect={(data: { buttonType: number; selection: Location[] }) => {
+												updateValue(device.deviceId, "location", data.selection[0].id);
+											}}
+											quickFind={true}
+										/>
+									</div>
+									<div>
+										<h3>Schriftgröße</h3>
+										<SelectButton
+											label={device.fontSize.toString() || "bitte wählen"}
+											title="wähle eine Schriftgröße"
+											list={fontSize}
+											listKey={"value"}
+											listValue={"value"}
+											onSelect={(data: {
+												buttonType: number;
+												selection: { value: number }[];
+											}) => {
+												updateValue(device.deviceId, "fontSize", data.selection[0].value);
+											}}
+											showSelection
+										/>
+									</div>
+									<Accordion head="Wartung">
+										<Button className="delete" onClick={() => deleteDevice(device.deviceId)}>
+											löschen
+										</Button>
+									</Accordion>
+								</div>
+							</Accordion>
+						);
+					})}
 				</>
 			)}
 		</>

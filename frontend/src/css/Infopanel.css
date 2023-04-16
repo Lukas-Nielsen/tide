@@ -1,0 +1,48 @@
+.tapp.infopanel {
+	padding: 3rem !important;
+}
+
+.infopanel--wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+@media (orientation: landscape) {
+	.infopanel--wrapper {
+		display: grid;
+		grid-template-columns: repeat(2, 50%);
+	}
+}
+
+:root {
+	--font-size-factor: 1;
+}
+
+[data-font-size-factor="1.25"] {
+	--font-size-factor: 1.25;
+}
+
+[data-font-size-factor="1.5"] {
+	--font-size-factor: 1.5;
+}
+
+[data-font-size-factor="1.75"] {
+	--font-size-factor: 1.75;
+}
+
+[data-font-size-factor="2"] {
+	--font-size-factor: 2;
+}
+
+h1 {
+	font-size: calc(1.83348rem * var(--font-size-factor)) !important;
+}
+
+h2 {
+	font-size: calc(1.50993rem * var(--font-size-factor)) !important;
+}
+
+* {
+	font-size: calc(16.97464px * var(--font-size-factor)) !important;
+}

@@ -1,12 +1,11 @@
 import React from "react";
 import { render } from "react-dom";
-import { useTranslation } from "./const/language";
-import View from "./pages/View";
+import User from "./pages/User";
 import Admin from "./pages/Admin";
 import { ChaynsProvider, useIsAdminMode, useUser } from "chayns-api";
+import Infopanel from "./pages/Infopanel";
 
 const PageWrapper = () => {
-	const translation = useTranslation();
 	const isAdminMode = useIsAdminMode();
 	const user = useUser();
 
@@ -18,8 +17,8 @@ const PageWrapper = () => {
 	)
 		return (
 			<>
-				<h2>{translation.main.noPermission}</h2>
-				<View />
+				<h2>Dir Fehlen die Berechtigungen zum Anzeigen der Konfiguration.</h2>
+				<User />
 			</>
 		);
 
@@ -31,18 +30,17 @@ const PageWrapper = () => {
 	)
 		return <Admin />;
 
-	return <View />;
+	return <User />;
 };
 
 const Footer = () => {
-	const translation = useTranslation();
 	return (
 		<span>
 			© {new Date().getFullYear()} by{" "}
 			<a target="_blank" href="https://chayns.de/lukas.nielsen" rel="noreferrer">
 				Lukas Nielsen
 			</a>{" "}
-			- {translation.main.dataFrom}{" "}
+			- Daten von{" "}
 			<a target="_blank" href="https://www.bsh.de" rel="noreferrer">
 				BSH
 			</a>
@@ -51,6 +49,14 @@ const Footer = () => {
 };
 
 const App = () => {
+	if (window.location.pathname.includes("/info-ui/")) {
+		return (
+			<>
+				<Infopanel />
+				<Footer />
+			</>
+		);
+	}
 	return (
 		<ChaynsProvider>
 			<PageWrapper />
