@@ -38,7 +38,7 @@ if ($data !== false) {
         $datetime = new \DateTime($entry["timestamp"]);
 
         $callback[substr($entry["timestamp"], 0, 10)][] = [
-            "timestamp" => $datetime->format(\DateTime::ATOM),
+            "timestamp" => str_replace(" ", "T", $entry["timestamp"]) . "+01:00",
             "state" => $entry["state"],
             "height" => $entry["height"]
         ];
