@@ -2,10 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
-	"io/ioutil"
-	"log"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -13,123 +12,75 @@ import (
 )
 
 type tide struct {
-	State     string `json:"state"`
-	Timestamp string `json:"timestamp"`
-	Height    string `json:"height"`
+	State     string  `json:"state"`
+	Timestamp string  `json:"timestamp"`
+	Height    float64 `json:"height,omitempty"`
 }
-
-type conf struct {
-	ID          int    `json:"id"`
-	DisplayName string `json:"displayName"`
-}
-
-var (
-	year         int
-	backendUrl   string
-	backendToken string
-	confFile     string
-	localConf    []conf
-	err          error
-)
 
 const (
-	CONF_URL      = "https://raw.githubusercontent.com/Lukas-Nielsen/tide-import/main/location.json"
 	BSH_TIMESTAMP = "02.01.2006 15:04"
-	DB_TIMESTAMP  = "2006-01-02 15:04"
+	FILE_DATE     = "2006-01-02"
+	FILE_TIME     = "15:04"
 )
 
-func init() {
-	flag.StringVar(&backendUrl, "url", "", "")
-	flag.StringVar(&backendToken, "token", "", "")
-	flag.StringVar(&confFile, "file", "", "")
-	flag.Parse()
-	if len(backendUrl) == 0 || len(backendToken) == 0 {
-		log.Fatalln("please provide '--token' and '--url' optionaly: '--file'")
-	}
-
-	if time.Now().Month() == 12 {
-		year = int(time.Now().Year()) + 1
-	} else {
-		year = time.Now().Year()
-	}
-}
-
 func main() {
+	locations := make(map[string]string)
+	for year := time.Now().Year(); year < time.Now().Year()+2; year++ {
+		for id := 1; id < 1000; id++ {
+			data, err := getData(year, id)
+			result := make(map[string][]tide)
+			if err == nil {
+				for _, row := range data {
+					row := row
+					rowArray := strings.Split(row, "#")
+					if rowArray[0] == "A04" {
+						locations[fmt.Sprint(id)] = rowArray[2]
+					}
+					if len(rowArray) >= 12 {
+						timestamp, err := time.Parse(BSH_TIMESTAMP, strings.ReplaceAll(rowArray[5], " ", "0")+" "+strings.ReplaceAll(rowArray[6], " ", "0"))
+						if err == nil {
+							entryDate := timestamp.Format(FILE_DATE)
+							entryTime := timestamp.Format(FILE_TIME)
+							temp := tide{
+								State:     rowArray[3],
+								Timestamp: entryDate + "T" + entryTime + "+01:00",
+							}
+							height, err := strconv.ParseFloat(strings.TrimSpace(rowArray[7]), 64)
+							if err == nil {
+								temp.Height = height
+							}
 
-	if len(confFile) > 0 {
-		content, err := ioutil.ReadFile(confFile)
-		if err != nil {
-			log.Fatal("error when opening file: ", err)
-		}
-
-		err = json.Unmarshal(content, &localConf)
-		if err != nil {
-			log.Fatal("Error during Unmarshal(): ", err)
-		}
-	} else {
-
-		localConf, err = getConf()
-		if err != nil {
-			log.Fatalln("error getting config: ", err)
-		}
-	}
-
-	for _, location := range localConf {
-		location := location
-
-		data, err := location.getData()
-		if err != nil {
-			log.Println("error getting data for location '"+location.DisplayName+"': ", err)
-		}
-		if len(data) == 0 {
-			log.Println("no data for location '"+location.DisplayName+"': ", err)
-		}
-
-		var postData []tide
-
-		for _, row := range data {
-			row := row
-			rowArray := strings.Split(row, "#")
-			if len(rowArray) >= 12 {
-				timestamp, err := time.Parse(BSH_TIMESTAMP, strings.ReplaceAll(rowArray[5], " ", "0")+" "+strings.ReplaceAll(rowArray[6], " ", "0"))
+							result[entryDate] = append(result[entryDate], temp)
+						}
+					}
+				}
+				jsonResult, err := json.Marshal(result)
+				path := "../frontend/public/data/" + fmt.Sprint(year)
+				file := path + "/" + fmt.Sprint(id) + ".json"
 				if err == nil {
-					postData = append(postData, tide{
-						State:     rowArray[3],
-						Timestamp: timestamp.Format(DB_TIMESTAMP),
-						Height:    rowArray[7],
-					})
+					os.MkdirAll(path, 0750)
+					os.WriteFile(file, jsonResult, 0644)
 				}
 			}
 		}
-
-		location.postData(postData)
-
+	}
+	jsonResult, err := json.Marshal(locations)
+	path := "../frontend/public/data"
+	file := path + "/locations.json"
+	if err == nil {
+		os.MkdirAll(path, 0750)
+		os.WriteFile(file, jsonResult, 0644)
 	}
 }
 
-func getConf() ([]conf, error) {
-	var data []conf
-	client := resty.New()
-
-	resp, err := client.R().
-		Get(CONF_URL)
-
-	if err != nil {
-		return []conf{}, err
-	}
-	if resp.IsError() {
-		return []conf{}, fmt.Errorf(resp.String())
-	}
-	json.Unmarshal(resp.Body(), &data)
-	return data, nil
-}
-
-func (c *conf) getData() ([]string, error) {
-	year := fmt.Sprint(year)
-	url := "https://filebox.bsh.de/index.php/s/SbJ3z5NBkpOZloY/download?path=%2Fvb_hwnw%2Fdeu" + year + "&files=DE__" + fmt.Sprint(c.ID) + "P" + year + ".txt"
+func getData(year int, id int) ([]string, error) {
+	yearStr := fmt.Sprint(year)
+	url := "https://filebox.bsh.de/index.php/s/SbJ3z5NBkpOZloY/download?path=%2Fvb_hwnw%2Fdeu" + yearStr + "&files=DE__" + fmt.Sprint(id) + "P" + yearStr + ".txt"
 
 	client := resty.New()
-	resp, err := client.R().Get(url)
+	req := client.R()
+
+	resp, err := req.Get(url)
 	if err != nil {
 		return []string{}, err
 	}
@@ -137,19 +88,4 @@ func (c *conf) getData() ([]string, error) {
 		return []string{}, fmt.Errorf(resp.String())
 	}
 	return strings.Split(resp.String(), "\n"), nil
-}
-
-func (c *conf) postData(data []tide) {
-	client := resty.New()
-	resp, err := client.R().
-		SetHeader("x-tide-token", backendToken).
-		SetBody(&data).
-		SetQueryParam("location", fmt.Sprint(c.ID)).
-		Post(backendUrl)
-	if err != nil {
-		log.Println(err)
-	}
-	if resp.IsError() {
-		log.Println(resp.String())
-	}
 }

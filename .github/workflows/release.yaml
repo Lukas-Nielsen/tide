@@ -1,35 +1,33 @@
-name: release
+name: Build and Deploy to gh pages
 
 on:
     push:
-        tags:
-            - "*"
-      
+        branches:
+            - main
+
+permissions:
+    contents: write
+
 jobs:
-    test_release:
-        name: release
+    build-and-deploy:
+        concurrency: ci-${{ github.ref }}
         runs-on: ubuntu-latest
         steps:
-            - name: Check out the repo
+            - name: Checkout 🛎️
               uses: actions/checkout@v3
 
-            - name: setup node
+            - name: Setup Node
               uses: actions/setup-node@v3
               with:
                   node-version: 18
-            - name: build node
-              working-directory: frontend
-              run: | 
-                npm ci
-                npm run build
-            - name: Zip Frontend
-              run: (cd ./frontend/build && zip -q -r - .) > frontend.zip
-            - name: Zip Backend
-              run: (cd ./backend && zip -q -r - .) > backend.zip
-            - name: Release
-              uses: softprops/action-gh-release@v1
-              with:
-                generate_release_notes: true
-                files: |
-                  backend.zip
-                  frontend.zip
+                  cache: "npm"
+
+            - name: Install and Build 🔧
+              run: |
+                  CI=false && npm ci
+                  npm run build
+
+            # - name: Deploy 🚀
+            #   uses: JamesIves/github-pages-deploy-action@v4
+            #   with:
+            #       folder: build
