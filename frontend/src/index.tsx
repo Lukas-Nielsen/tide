@@ -17,7 +17,10 @@ const PageWrapper = () => {
 	)
 		return (
 			<>
-				<h2>Dir Fehlen die Berechtigungen zum Anzeigen der Konfiguration.</h2>
+				<h2>
+					Dir Fehlen die Berechtigungen zum Anzeigen der
+					Konfiguration.
+				</h2>
 				<User />
 			</>
 		);
@@ -37,7 +40,11 @@ const Footer = () => {
 	return (
 		<span>
 			© {new Date().getFullYear()} by{" "}
-			<a target="_blank" href="https://chayns.de/lukas.nielsen" rel="noreferrer">
+			<a
+				target="_blank"
+				href="https://chayns.de/lukas.nielsen"
+				rel="noreferrer"
+			>
 				Lukas Nielsen
 			</a>{" "}
 			- Daten von{" "}
@@ -65,10 +72,4 @@ const App = () => {
 	);
 };
 
-try {
-	const ReactDOMClient = require("react-dom/client");
-	const root = ReactDOMClient.createRoot(document.getElementById("root"));
-	root.render(<App />);
-} catch (error) {
-	render(<App />, document.getElementById("root"));
-}
+render(<App />, document.getElementById("root"));

@@ -3,12 +3,16 @@ import { Accordion, Button, Input, SelectButton } from "chayns-components";
 import "./../index.css";
 import "./../css/Admin.css";
 import locations from "../location.json";
-import { DialogType, createDialog, setWaitCursor, useAccessToken, useSite } from "chayns-api";
-import { Config } from "src/@types/config";
-import { displayDays } from "src/const/displayDays";
-import { fontSize } from "src/const/fontSize";
-import { DisplayDays } from "src/@types/displayDays";
-import { Location } from "src/@types/location";
+import {
+	setWaitCursor,
+	useAccessToken,
+	useSite,
+} from "chayns-api";
+import { Config } from "types/config";
+import { displayDays } from "const/displayDays";
+import { DisplayDays } from "types/displayDays";
+import { Location } from "types/location";
+import { fontSize } from "const/fontSize";
 
 const Admin = () => {
 	const [config, setConfig] = useState<Config[]>();
@@ -24,8 +28,8 @@ const Admin = () => {
 		value: number | string
 	) => {
 		if (config) {
-			let temp = [...config];
-			let index = temp.findIndex((entry) => entry.deviceId === deviceId);
+			const temp = [...config];
+			const index = temp.findIndex((entry) => entry.deviceId === deviceId);
 			if (index > -1) {
 				if (typeof value === "number") {
 					switch (valueType) {
@@ -53,7 +57,9 @@ const Admin = () => {
 
 	useEffect(() => {
 		if (siteId && isLoading) {
-			fetch(`https://tide.chayns.friesendev.de/api/config.php?siteId=${siteId}&deviceId=all`)
+			fetch(
+				`https://tide.chayns.friesendev.de/api/config.php?siteId=${siteId}&deviceId=all`
+			)
 				.then((resp) => {
 					if (resp.status === 200) {
 						return resp.json();
@@ -74,7 +80,11 @@ const Admin = () => {
 				config.forEach((device) => {
 					fetch(
 						`https://tide.chayns.friesendev.de/api/config.php?siteId=${siteId}&deviceId=${device.deviceId}&locationId=${locationId}`,
-						{ headers: { "x-chayns-token": accessToken }, body: JSON.stringify(device), method: "PUT" }
+						{
+							headers: { "x-chayns-token": accessToken },
+							body: JSON.stringify(device),
+							method: "PUT",
+						}
 					);
 				});
 			}
@@ -103,7 +113,11 @@ const Admin = () => {
 						return (
 							<Accordion
 								key={device.deviceId}
-								head={device.name.length === 0 ? device.deviceId : device.name}
+								head={
+									device.name.length === 0
+										? device.deviceId
+										: device.name
+								}
 								dataGroup="config"
 								defaultOpened={index === 0}
 							>
@@ -112,7 +126,11 @@ const Admin = () => {
 										<h3>Name</h3>
 										<Input
 											onChange={(e) => {
-												updateValue(device.deviceId, "name", e);
+												updateValue(
+													device.deviceId,
+													"name",
+													e
+												);
 											}}
 											value={device.name}
 											placeholder="Name"
@@ -122,15 +140,25 @@ const Admin = () => {
 										<h3>Tage zum Anzeigen</h3>
 										<SelectButton
 											label={
-												displayDays.find((entry) => entry.value === device.dayCount)?.name ||
-												"bitte wählen"
+												displayDays.find(
+													(entry) =>
+														entry.value ===
+														device.dayCount
+												)?.name || "bitte wählen"
 											}
 											title="Tage zum anzeigen"
 											list={displayDays}
 											listKey={"value"}
 											listValue={"name"}
-											onSelect={(data: { buttonType: number; selection: DisplayDays[] }) => {
-												updateValue(device.deviceId, "dayCount", data.selection[0].value);
+											onSelect={(data: {
+												buttonType: number;
+												selection: DisplayDays[];
+											}) => {
+												updateValue(
+													device.deviceId,
+													"dayCount",
+													data.selection[0].value
+												);
 											}}
 										/>
 									</div>
@@ -138,15 +166,25 @@ const Admin = () => {
 										<h3>Ort</h3>
 										<SelectButton
 											label={
-												locations.find((entry) => entry.id === device.location)?.displayName ||
-												"bitte wählen"
+												locations.find(
+													(entry) =>
+														entry.id ===
+														device.location
+												)?.displayName || "bitte wählen"
 											}
 											title="wähle einen Ort"
 											list={locations}
 											listKey={"id"}
 											listValue={"displayName"}
-											onSelect={(data: { buttonType: number; selection: Location[] }) => {
-												updateValue(device.deviceId, "location", data.selection[0].id);
+											onSelect={(data: {
+												buttonType: number;
+												selection: Location[];
+											}) => {
+												updateValue(
+													device.deviceId,
+													"location",
+													data.selection[0].id
+												);
 											}}
 											quickFind={true}
 										/>
@@ -154,7 +192,10 @@ const Admin = () => {
 									<div>
 										<h3>Schriftgröße</h3>
 										<SelectButton
-											label={device.fontSize.toString() || "bitte wählen"}
+											label={
+												device.fontSize.toString() ||
+												"bitte wählen"
+											}
 											title="wähle eine Schriftgröße"
 											list={fontSize}
 											listKey={"value"}
@@ -163,13 +204,22 @@ const Admin = () => {
 												buttonType: number;
 												selection: { value: number }[];
 											}) => {
-												updateValue(device.deviceId, "fontSize", data.selection[0].value);
+												updateValue(
+													device.deviceId,
+													"fontSize",
+													data.selection[0].value
+												);
 											}}
 											showSelection
 										/>
 									</div>
 									<Accordion head="Wartung">
-										<Button className="delete" onClick={() => deleteDevice(device.deviceId)}>
+										<Button
+											className="delete"
+											onClick={() =>
+												deleteDevice(device.deviceId)
+											}
+										>
 											löschen
 										</Button>
 									</Accordion>

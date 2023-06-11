@@ -23,7 +23,7 @@ jobs:
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
 
-      - name: Setup Node
+      - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version-file: "import/go.mod"

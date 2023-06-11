@@ -1,4 +1,4 @@
-import { DisplayDays } from "src/@types/displayDays";
+import { DisplayDays } from "types/displayDays";
 
 export const displayDays: DisplayDays[] = [
 	{

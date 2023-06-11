@@ -4,9 +4,9 @@ import "./../index.css";
 import "./../css/View.css";
 import locations from "../location.json";
 import { setWaitCursor, useLanguage } from "chayns-api";
-import { DisplayDays } from "src/@types/displayDays";
-import { displayDays } from "src/const/displayDays";
-import { Location } from "src/@types/location";
+import { Location } from "types/location";
+import { displayDays } from "const/displayDays";
+import { DisplayDays } from "types/displayDays";
 
 const User = () => {
 	type stateType = {
@@ -46,7 +46,9 @@ const User = () => {
 	setWaitCursor({ isEnabled: isLoading });
 
 	useEffect(() => {
-		fetch(`https://tide.chayns.friesendev.de/api/serve.php?location=${location.id}&days=${dayCount}`)
+		fetch(
+			`https://tide.chayns.friesendev.de/api/serve.php?location=${location.id}&days=${dayCount}`
+		)
 			.then((response) => {
 				if (response.status === 200) {
 					return response.json();
@@ -77,7 +79,10 @@ const User = () => {
 							list={locations}
 							listKey={"id"}
 							listValue={"displayName"}
-							onSelect={(data: { buttonType: number; selection: Location[] }) => {
+							onSelect={(data: {
+								buttonType: number;
+								selection: Location[];
+							}) => {
 								setLocation({
 									id: data.selection[0].id,
 									displayName: data.selection[0].displayName,
@@ -86,21 +91,32 @@ const User = () => {
 									"tide-location",
 									JSON.stringify({
 										id: data.selection[0].id,
-										displayName: data.selection[0].displayName,
+										displayName:
+											data.selection[0].displayName,
 									})
 								);
 							}}
 							quickFind={true}
 						/>
 						<SelectButton
-							label={displayDays.find((entry) => entry.value === dayCount)?.name || "unbekannt"}
+							label={
+								displayDays.find(
+									(entry) => entry.value === dayCount
+								)?.name || "unbekannt"
+							}
 							title="Tage zum anzeigen"
 							list={displayDays}
 							listKey={"value"}
 							listValue={"name"}
-							onSelect={(data: { buttonType: number; selection: DisplayDays[] }) => {
+							onSelect={(data: {
+								buttonType: number;
+								selection: DisplayDays[];
+							}) => {
 								setDayCount(data.selection[0].value);
-								localStorage.setItem("tide-day-count", JSON.stringify(data.selection[0].value));
+								localStorage.setItem(
+									"tide-day-count",
+									JSON.stringify(data.selection[0].value)
+								);
 							}}
 						/>
 					</div>
@@ -110,7 +126,7 @@ const User = () => {
 			{!isLoading && !data && <h3>Fehler beim anzeigen</h3>}
 			{!isLoading &&
 				data?.map((day, index) => {
-					let date = new Date(day[0].timestamp);
+					const date = new Date(day[0].timestamp);
 					return (
 						<Accordion
 							defaultOpened={index === 0 ? true : false}
@@ -126,25 +142,38 @@ const User = () => {
 							<table>
 								<thead>
 									<tr>
-										<th className="table-col-time">Uhrzeit</th>
-										<th className="table-col-height">Wasserstand</th>
-										<th className="table-col-state">&nbsp;</th>
+										<th className="table-col-time">
+											Uhrzeit
+										</th>
+										<th className="table-col-height">
+											Wasserstand
+										</th>
+										<th className="table-col-state">
+											&nbsp;
+										</th>
 									</tr>
 								</thead>
 								<tbody>
 									{day.map((event) => {
-										let time = new Date(event.timestamp);
+										const time = new Date(event.timestamp);
 										return (
 											<tr key={event.timestamp}>
 												<td>
-													{time.toLocaleTimeString(locale, {
-														hour: "numeric",
-														minute: "numeric",
-													})}
+													{time.toLocaleTimeString(
+														locale,
+														{
+															hour: "numeric",
+															minute: "numeric",
+														}
+													)}
 												</td>
 												<td>
-													{event.height === 0 && "unbekannt"}
-													{event.height !== 0 && event.height.toFixed(2) + "m"}
+													{event.height === 0 &&
+														"unbekannt"}
+													{event.height !== 0 &&
+														event.height.toFixed(
+															2
+														) + "m"}
 												</td>
 												<td>{states[event.state]}</td>
 											</tr>
