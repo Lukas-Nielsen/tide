@@ -31,13 +31,13 @@
 		]
 	},
 	"dependencies": {
+		"@chayns-components/core": "^5.0.0-beta.189",
 		"chayns-api": "^1.0.27",
-		"chayns-components": "^4.30.1",
-		"react": "^17.0.2",
-		"react-dom": "^17.0.2"
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"react-router-dom": "^6.12.1"
 	},
 	"devDependencies": {
-		"@types/chayns-components": "github:lukas-nielsen/types-chayns-components",
 		"@types/crypto-js": "^4.1.1",
 		"@types/node": "^20.2.5",
 		"@types/react": "^18.2.8",

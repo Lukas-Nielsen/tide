@@ -1,4 +1,6 @@
-export interface Location {
+export type locations = { [key: string]: location };
+
+export interface location {
 	id: number;
-	displayName: string;
+	name: string;
 }

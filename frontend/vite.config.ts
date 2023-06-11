@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import checker from "vite-plugin-checker";
+import { resolve } from "path";
 
 export default defineConfig({
 	plugins: [
@@ -11,5 +12,17 @@ export default defineConfig({
 		}),
 	],
 	server: { open: true, port: 3000 },
-	build: { emptyOutDir: true, outDir: "./build" },
+	build: {
+		emptyOutDir: true,
+		outDir: "./build",
+	},
+	resolve: {
+		alias: {
+			"@": resolve(__dirname, "./src"),
+		},
+	},
+	define: {
+		"process.env.BUILD_ENV": "'custom'",
+		"process.env.VERSION": "'custom'",
+	},
 });

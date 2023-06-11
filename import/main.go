@@ -3,18 +3,26 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/transform"
 )
 
 type tide struct {
 	State     string  `json:"state"`
 	Timestamp string  `json:"timestamp"`
 	Height    float64 `json:"height,omitempty"`
+}
+
+type location struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 const (
@@ -24,7 +32,7 @@ const (
 )
 
 func main() {
-	locations := make(map[string]string)
+	locations := make(map[string]location)
 	for year := time.Now().Year(); year < time.Now().Year()+2; year++ {
 		for id := 1; id < 1000; id++ {
 			data, err := getData(year, id)
@@ -34,7 +42,7 @@ func main() {
 					row := row
 					rowArray := strings.Split(row, "#")
 					if rowArray[0] == "A04" {
-						locations[fmt.Sprint(id)] = rowArray[2]
+						locations[fmt.Sprint(id)] = location{ID: id, Name: rowArray[2]}
 					}
 					if len(rowArray) >= 12 {
 						timestamp, err := time.Parse(BSH_TIMESTAMP, strings.ReplaceAll(rowArray[5], " ", "0")+" "+strings.ReplaceAll(rowArray[6], " ", "0"))
@@ -87,5 +95,11 @@ func getData(year int, id int) ([]string, error) {
 	if resp.IsError() {
 		return []string{}, fmt.Errorf(resp.String())
 	}
-	return strings.Split(resp.String(), "\n"), nil
+	return strings.Split(UTF8(resp.String()), "\n"), nil
+}
+
+func UTF8(text string) string {
+	reader := transform.NewReader(strings.NewReader(text), charmap.Windows1252.NewDecoder())
+	decBytes, _ := io.ReadAll(reader)
+	return string(decBytes)
 }

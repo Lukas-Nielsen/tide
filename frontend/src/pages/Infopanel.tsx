@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import "./../index.css";
-import "./../css/View.css";
-import "./../css/Infopanel.css";
-import locations from "../location.json";
-import { Config } from "types/config";
+import "@/index.css";
+import "@/css/View.css";
+import "@/css/Infopanel.css";
 
 const Infopanel = () => {
 	type stateType = {
@@ -21,101 +19,16 @@ const Infopanel = () => {
 		N: "NW",
 	};
 
-	const [data, setData] = useState<dataType[][]>();
-	const [isLoading, setIsLoading] = useState(true);
-
-	const [deviceId, setDeviceId] = useState<string>();
-
-	const [config, setConfig] = useState<Config>(
-		JSON.parse(
-			localStorage.getItem("tide-config") ||
-				JSON.stringify({
-					location: 635,
-					name: "unbekannt",
-					dayCount: 3,
-					fontSize: 1,
-				} as Config)
-		)
-	);
-
-	useEffect(() => {
-		let localDeviceId = localStorage.getItem("tide-device-id");
-		if (
-			localDeviceId === null ||
-			localDeviceId.length <= 10 ||
-			localDeviceId.length >= 20
-		) {
-			localDeviceId = Date.now().toString(16).toUpperCase();
-			localStorage.setItem("tide-device-id", localDeviceId);
-		}
-		setDeviceId(localDeviceId);
-	}, []);
+	const [data] = useState<dataType[][]>();
+	const [isLoading] = useState(true);
 
 	useEffect(() => {
 		document.querySelector(".tapp")?.classList.add("infopanel");
 	}, []);
 
-	useEffect(() => {
-		fetch(
-			`https://tide.chayns.friesendev.de/api/serve.php?location=${config.location}&days=${config.dayCount}`
-		)
-			.then((response) => {
-				if (response.status === 200) {
-					return response.json();
-				}
-				return undefined;
-			})
-			.then((actualData) => {
-				setData(actualData);
-			})
-			.catch(() => {
-				setData(undefined);
-			})
-			.finally(() => {
-				setIsLoading(false);
-			});
-		return setIsLoading(true);
-	}, [config]);
-
-	useEffect(() => {
-		const getSiteId = () => {
-			const searchParams = new URL(window.location.href).searchParams;
-			if (searchParams.has("siteId")) {
-				return searchParams.get("siteId");
-			}
-			return undefined;
-		};
-
-		const siteId = getSiteId();
-
-		if (siteId && deviceId) {
-			fetch(
-				`https://tide.chayns.friesendev.de/api/config.php?siteId=${siteId}&deviceId=${deviceId}`
-			)
-				.then((response) => {
-					if (response.status === 200) {
-						return response.json();
-					}
-					return undefined;
-				})
-				.then((actualData) => {
-					if (actualData) setConfig(actualData);
-				})
-				.catch;
-		}
-	}, [deviceId]);
-
 	return (
-		<div data-font-size-factor={config.fontSize}>
-			{!isLoading && data && (
-				<h1>
-					Gezeiten -{" "}
-					{
-						locations.find((entry) => entry.id === config.location)
-							?.displayName
-					}
-				</h1>
-			)}
+		<div data-font-size-factor={""}>
+			{!isLoading && data && <h1>Gezeiten - </h1>}
 			{!isLoading && !data && <h3>Fehler beim anzeigen</h3>}
 			<div className="infopanel--wrapper">
 				{!isLoading &&
