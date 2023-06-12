@@ -1,6 +1,5 @@
 import React from "react";
 import { tide } from "types/tide";
-import { useLanguage } from "chayns-api";
 import { Accordion, AccordionContent } from "@chayns-components/core";
 
 type stateType = {
@@ -12,20 +11,24 @@ const states: stateType = {
 	N: "NW",
 };
 
-export const TideDay = (props: { data: tide[]; open?: boolean }) => {
-	const { active: locale } = useLanguage();
-
+export const TideDay = (props: {
+	data: tide[];
+	open?: boolean;
+	infopanel?: boolean;
+}) => {
 	const date = new Date(props.data[0].timestamp);
+	
 	return (
 		props.data.length > 0 && (
 			<Accordion
-				title={date.toLocaleDateString(locale, {
+				title={date.toLocaleDateString("de", {
 					weekday: "long",
 					year: "numeric",
 					month: "long",
 					day: "numeric",
 				})}
 				isDefaultOpen={props.open}
+				isFixed={props.infopanel}
 			>
 				<AccordionContent>
 					<table>
@@ -46,7 +49,7 @@ export const TideDay = (props: { data: tide[]; open?: boolean }) => {
 								return (
 									<tr key={entry.timestamp}>
 										<td>
-											{time.toLocaleTimeString(locale, {
+											{time.toLocaleTimeString("de", {
 												hour: "numeric",
 												minute: "numeric",
 											})}

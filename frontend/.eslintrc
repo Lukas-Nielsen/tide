@@ -1,6 +1,7 @@
 {
 	"rules": {
-		"@typescript-eslint/no-explicit-any": "off"
+		"@typescript-eslint/no-explicit-any": "off",
+		"no-mixed-spaces-and-tabs": "off"
 	},
 	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
 	"parser": "@typescript-eslint/parser",

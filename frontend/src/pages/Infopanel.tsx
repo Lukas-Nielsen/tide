@@ -1,101 +1,82 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import "@/index.css";
 import "@/css/View.css";
 import "@/css/Infopanel.css";
+import { tides } from "@/types/tide";
+import { TideDay } from "@/components/TideDay";
+import { LocationName } from "@/components/LocationName";
+import { ColorSchemeProvider } from "@chayns-components/core";
+import { useParams } from "react-router-dom";
 
-const Infopanel = () => {
-	type stateType = {
-		[key: string]: string;
-	};
+export const Infopanel = () => {
+	return (
+		<ColorSchemeProvider>
+			<InfopanelContent />
+		</ColorSchemeProvider>
+	);
+};
 
-	type dataType = {
-		timestamp: string;
-		state: string;
-		height: number;
-	};
+const InfopanelContent = () => {
+	const [data, setData] = useState<tides>();
+	const [renderData, setRenderData] = useState<ReactNode[]>();
+	const [isLoading, setIsLoading] = useState(true);
+	const { locationId, dayCount, fontSize } = useParams();
 
-	const states: stateType = {
-		H: "HW",
-		N: "NW",
-	};
+	useEffect(() => {
+		if (locationId) {
+			fetch(`/data/${new Date().getFullYear()}/${locationId}.json`)
+				.then((response) => {
+					if (response.status === 200) {
+						return response.json();
+					}
+					return undefined;
+				})
+				.then((json) => {
+					setData(json);
+				})
+				.finally(() => {
+					setIsLoading(false);
+				})
+				.catch(() => setData(undefined));
+			return setIsLoading(true);
+		}
+	}, [locationId]);
 
-	const [data] = useState<dataType[][]>();
-	const [isLoading] = useState(true);
+	useEffect(() => {
+		if (data && dayCount) {
+			const temp: ReactNode[] = [];
+			for (let i = 0; i < parseInt(dayCount); i++) {
+				const date = new Date();
+				date.setDate(date.getDate() + i);
+				temp.push(
+					<TideDay
+						key={date.toISOString()}
+						data={
+							(data &&
+								data[date.toISOString().substring(0, 10)]) ||
+							[]
+						}
+						open
+						infopanel
+					/>
+				);
+			}
+			setRenderData(temp);
+		}
+	}, [data, dayCount]);
 
 	useEffect(() => {
 		document.querySelector(".tapp")?.classList.add("infopanel");
 	}, []);
 
 	return (
-		<div data-font-size-factor={""}>
-			{!isLoading && data && <h1>Gezeiten - </h1>}
-			{!isLoading && !data && <h3>Fehler beim anzeigen</h3>}
-			<div className="infopanel--wrapper">
-				{!isLoading &&
-					data?.map((day) => {
-						const date = new Date(day[0].timestamp);
-						return (
-							<div key={day[0].timestamp} className="container">
-								<h2>
-									{date.toLocaleDateString("de", {
-										weekday: "long",
-										year: "numeric",
-										month: "long",
-										day: "numeric",
-									})}
-								</h2>
-								<table>
-									<thead>
-										<tr>
-											<th className="table-col-time">
-												Uhrzeit
-											</th>
-											<th className="table-col-height">
-												Wasserstand
-											</th>
-											<th className="table-col-state">
-												&nbsp;
-											</th>
-										</tr>
-									</thead>
-									<tbody>
-										{day.map((event) => {
-											const time = new Date(
-												event.timestamp
-											);
-											return (
-												<tr key={event.timestamp}>
-													<td>
-														{time.toLocaleTimeString(
-															"de",
-															{
-																hour: "numeric",
-																minute: "numeric",
-															}
-														)}
-													</td>
-													<td>
-														{event.height === 0 &&
-															"unbekannt"}
-														{event.height !== 0 &&
-															event.height.toFixed(
-																2
-															) + "m"}
-													</td>
-													<td>
-														{states[event.state]}
-													</td>
-												</tr>
-											);
-										})}
-									</tbody>
-								</table>
-							</div>
-						);
-					})}
-			</div>
+		<div data-font-size-factor={fontSize}>
+			{!isLoading && data && locationId && (
+				<h1>
+					Gezeiten - <LocationName id={parseInt(locationId)} />
+				</h1>
+			)}
+			<div className="infopanel--wrapper">{!isLoading && renderData}</div>
 		</div>
 	);
 };
-
-export default Infopanel;
