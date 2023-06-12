@@ -32,8 +32,13 @@ const (
 )
 
 func main() {
+	limitYear := time.Now().Year() + 1
+	if time.Now().Month() == time.December {
+		limitYear++
+	}
+
 	locations := make(map[string]location)
-	for year := time.Now().Year(); year < time.Now().Year()+2; year++ {
+	for year := time.Now().Year(); year < limitYear; year++ {
 		for id := 1; id < 1000; id++ {
 			data, err := getData(year, id)
 			result := make(map[string][]tide)
