@@ -2,13 +2,23 @@ import { LocationSelect } from "@/components/LocationSelect";
 import React, { ReactNode, useEffect, useState } from "react";
 import "@/index.css";
 import "@/css/View.css";
-import { setWaitCursor } from "chayns-api";
+import { ChaynsProvider, setWaitCursor } from "chayns-api";
 import { tides } from "@/types/tide";
 import { TideDay } from "@/components/TideDay";
 import { LocationName } from "@/components/LocationName";
-import { AccordionGroup } from "@chayns-components/core";
+import { AccordionGroup, ColorSchemeProvider } from "@chayns-components/core";
 
 export const User = () => {
+	return (
+		<ChaynsProvider>
+			<ColorSchemeProvider>
+				<UserContent />
+			</ColorSchemeProvider>
+		</ChaynsProvider>
+	);
+};
+
+const UserContent = () => {
 	const [data, setData] = useState<tides>();
 	const [renderData, setRenderData] = useState<ReactNode[]>();
 	const [isLoading, setIsLoading] = useState(true);
