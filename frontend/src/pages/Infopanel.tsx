@@ -3,10 +3,10 @@ import "@/index.css";
 import "@/css/View.css";
 import "@/css/Infopanel.css";
 import { tides } from "@/types/tide";
-import { TideDay } from "@/components/TideDay";
 import { LocationName } from "@/components/LocationName";
 import { ColorSchemeProvider } from "@chayns-components/core";
 import { useParams } from "react-router-dom";
+import { TideDayInfo } from "@/components/TideDayInfo";
 
 export const Infopanel = () => {
 	return (
@@ -49,15 +49,13 @@ const InfopanelContent = () => {
 				const date = new Date();
 				date.setDate(date.getDate() + i);
 				temp.push(
-					<TideDay
+					<TideDayInfo
 						key={date.toISOString()}
 						data={
 							(data &&
 								data[date.toISOString().substring(0, 10)]) ||
 							[]
 						}
-						open
-						infopanel
 					/>
 				);
 			}

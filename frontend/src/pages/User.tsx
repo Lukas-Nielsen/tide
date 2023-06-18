@@ -4,9 +4,9 @@ import "@/index.css";
 import "@/css/View.css";
 import { ChaynsProvider, setWaitCursor } from "chayns-api";
 import { tides } from "@/types/tide";
-import { TideDay } from "@/components/TideDay";
 import { LocationName } from "@/components/LocationName";
 import { AccordionGroup, ColorSchemeProvider } from "@chayns-components/core";
+import { TideDayUser } from "@/components/TideDayUser";
 
 export const User = () => {
 	return (
@@ -52,7 +52,7 @@ const UserContent = () => {
 				const date = new Date();
 				date.setDate(date.getDate() + i);
 				temp.push(
-					<TideDay
+					<TideDayUser
 						key={date.toISOString()}
 						data={
 							(data &&
