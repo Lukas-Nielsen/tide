@@ -1,10 +1,10 @@
 module tide-backend
 
-go 1.20
+go 1.21
 
-require github.com/go-resty/resty/v2 v2.7.0
+require github.com/go-resty/resty/v2 v2.8.0
 
 require (
-	golang.org/x/net v0.10.0 // indirect
-	golang.org/x/text v0.9.0
+	golang.org/x/net v0.15.0 // indirect
+	golang.org/x/text v0.13.0
 )
