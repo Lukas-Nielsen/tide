@@ -1,12 +1,15 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
 import { Footer } from "./Footer";
+import { ColorSchemeProvider } from "@chayns-components/core";
+import { useSite } from "chayns-api";
+import { User } from "./pages/User";
 
 export const Layout = () => {
+	const { color, colorMode } = useSite();
 	return (
-		<>
-			<Outlet />
+		<ColorSchemeProvider color={color} colorMode={colorMode}>
+			<User />
 			<Footer />
-		</>
+		</ColorSchemeProvider>
 	);
 };

@@ -1,10 +1,10 @@
-import { location } from "@/types/location";
 import { setWaitCursor } from "chayns-api";
 import React, { useEffect, useState } from "react";
 import { SelectButton } from "./SelectButton";
+import { ILocation } from "../types/location";
 
 export const LocationSelect = (props: { onSelect?: (e: number) => void }) => {
-	const [data, setData] = useState<location[]>();
+	const [data, setData] = useState<ILocation[]>();
 	const [location, setLocation] = useState<number>(635);
 	const [isLoading, setLoading] = useState<boolean>(true);
 
@@ -19,9 +19,9 @@ export const LocationSelect = (props: { onSelect?: (e: number) => void }) => {
 				return undefined;
 			})
 			.then((json) => {
-				const temp: location[] = [];
+				const temp: ILocation[] = [];
 				for (const k in json) {
-					const item: location = json[k];
+					const item: ILocation = json[k];
 					temp.push(item);
 				}
 				setData(temp);

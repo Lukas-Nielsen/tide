@@ -1,4 +1,4 @@
-export interface DisplayDays {
+export interface IDisplayDays {
 	value: number;
 	name: string;
 }

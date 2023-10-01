@@ -1,6 +1,6 @@
-export type locations = { [key: string]: location };
+export type ILocations = { [key: string]: ILocation };
 
-export interface location {
+export interface ILocation {
 	id: number;
 	name: string;
 }

@@ -1,25 +1,20 @@
 import React from "react";
-import { tide } from "types/tide";
 import { Accordion, AccordionContent } from "@chayns-components/core";
 import { TideDay } from "./TideDay";
+import { ITide } from "../types/tide";
 
-export const TideDayUser = (props: { data: tide[]; open?: boolean }) => {
+export const TideDayUser = (props: { data: ITide[]; open?: boolean }) => {
 	const date = new Date(props.data[0].timestamp);
 
 	return (
 		props.data.length > 0 && (
 			<Accordion
-				title=""
-				titleElement={
-					<div style={{ lineHeight: 2 }}>
-						{date.toLocaleDateString("de", {
-							weekday: "long",
-							year: "numeric",
-							month: "long",
-							day: "numeric",
-						})}
-					</div>
-				}
+				title={date.toLocaleDateString("de", {
+					weekday: "long",
+					year: "numeric",
+					month: "long",
+					day: "numeric",
+				})}
 				isDefaultOpen={props.open}
 			>
 				<AccordionContent>

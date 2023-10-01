@@ -27,17 +27,20 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version-file: "import/go.mod"
+          cache-dependency-path: "import/go.sum"
 
-      - name: Install and Build 🔧
+      - name: build go 🔧
+        working-directory: import
         run: |
-          cd import
-          go run ./
-          cd ../frontend
+          go run .
+      
+      - name: build frontend
+        working-directory: frontend
+        run: |
           CI=false && npm ci
           npm run build
 
       - name: Deploy 🚀
-        run: |
-          cd build
-          zip -r build.zip ./
-          curl -F "data=@build.zip" https://tide.chayns.friesendev.de/update_frontend.php -H "X-TOKEN: ${{ secrets.DEPLOY_TOKEN }}"
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: frontend/build

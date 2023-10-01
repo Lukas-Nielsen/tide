@@ -90,17 +90,14 @@ export const SelectButton = (props: {
 	isSecondary?: boolean;
 }) => {
 	const handleClick = () => {
-		const list: SelectDialogItem[] = [];
-		props.list.map((item) => {
-			list.push({
-				name: item[props.listValue || "value"],
-				value: item[props.listKey || "key"],
-			} as SelectDialogItem);
-		});
-
 		dialog
 			.select({
-				list: list,
+				list: props.list.map((item) => {
+					return {
+						name: item[props.listValue || "value"],
+						value: item[props.listKey || "key"],
+					} as SelectDialogItem;
+				}),
 				multiselect: props.multiSelect,
 				quickfind: props.quickFind,
 				title: props.title,

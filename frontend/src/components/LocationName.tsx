@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { locations } from "types/location";
+import { ILocations } from "../types/location";
 
 export const LocationName = (props: { id?: number }) => {
-	const [data, setData] = useState<locations>();
+	const [data, setData] = useState<ILocations>();
 
 	useEffect(() => {
 		fetch("/data/locations.json")

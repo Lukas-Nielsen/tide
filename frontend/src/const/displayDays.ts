@@ -1,6 +1,6 @@
-import { DisplayDays } from "types/displayDays";
+import { IDisplayDays } from "../types/displayDays";
 
-export const displayDays: DisplayDays[] = [
+export const displayDays: IDisplayDays[] = [
 	{
 		name: "1 Tag",
 		value: 1,

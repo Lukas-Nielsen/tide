@@ -1,28 +1,21 @@
-import { LocationSelect } from "@/components/LocationSelect";
-import React, { ReactNode, useEffect, useState } from "react";
-import "@/index.css";
-import "@/css/View.css";
-import { ChaynsProvider, setWaitCursor } from "chayns-api";
-import { tides } from "@/types/tide";
-import { LocationName } from "@/components/LocationName";
-import { AccordionGroup, ColorSchemeProvider } from "@chayns-components/core";
-import { TideDayUser } from "@/components/TideDayUser";
+import React, { useEffect, useState } from "react";
+import { AccordionGroup } from "@chayns-components/core";
+import { setWaitCursor } from "chayns-api";
+import { ITides } from "../types/tide";
+import { LocationSelect } from "../components/LocationSelect";
+import { LocationName } from "../components/LocationName";
+import { checkDate, isToday } from "../const/checkDate";
+import { TideDayUser } from "../components/TideDayUser";
+import { DaySelect } from "../components/DaySelect";
 
 export const User = () => {
-	return (
-		<ChaynsProvider>
-			<ColorSchemeProvider>
-				<UserContent />
-			</ColorSchemeProvider>
-		</ChaynsProvider>
-	);
+	return <UserContent />;
 };
 
 const UserContent = () => {
-	const [data, setData] = useState<tides>();
-	const [renderData, setRenderData] = useState<ReactNode[]>();
+	const [data, setData] = useState<ITides>();
 	const [isLoading, setIsLoading] = useState(true);
-	const [dayCount] = useState<number>(7);
+	const [dayCount, setDayCount] = useState<number>(7);
 	const [location, setLocation] = useState<number>(635);
 
 	setWaitCursor({ isEnabled: isLoading });
@@ -45,34 +38,13 @@ const UserContent = () => {
 		return setIsLoading(true);
 	}, [location]);
 
-	useEffect(() => {
-		if (data) {
-			const temp: ReactNode[] = [];
-			for (let i = 0; i < dayCount; i++) {
-				const date = new Date();
-				date.setDate(date.getDate() + i);
-				temp.push(
-					<TideDayUser
-						key={date.toISOString()}
-						data={
-							(data &&
-								data[date.toISOString().substring(0, 10)]) ||
-							[]
-						}
-						open={i === 0}
-					/>
-				);
-			}
-			setRenderData(temp);
-		}
-	}, [data, dayCount]);
-
 	return (
 		<div>
 			<>
 				<h1>Parameter</h1>
-				<div className="settings">
+				<div style={{ display: "flex", gap: "1rem" }}>
 					<LocationSelect onSelect={(e) => setLocation(e)} />
+					<DaySelect onSelect={(e) => setDayCount(e)} />
 				</div>
 			</>
 			{!isLoading && data && (
@@ -81,7 +53,21 @@ const UserContent = () => {
 				</h1>
 			)}
 			{!isLoading && !data && <h3>Fehler beim anzeigen</h3>}
-			{!isLoading && <AccordionGroup>{renderData}</AccordionGroup>}
+			{!isLoading && data && (
+				<AccordionGroup>
+					{Object.keys(data).map((date) => {
+						if (checkDate(new Date(date), dayCount)) {
+							return (
+								<TideDayUser
+									key={date}
+									data={data[date]}
+									open={isToday(date)}
+								/>
+							);
+						}
+					})}
+				</AccordionGroup>
+			)}
 		</div>
 	);
 };

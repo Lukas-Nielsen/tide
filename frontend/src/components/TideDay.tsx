@@ -1,5 +1,5 @@
 import React from "react";
-import { tide } from "types/tide";
+import { ITide } from "../types/tide";
 
 type stateType = {
 	[key: string]: string;
@@ -10,17 +10,21 @@ const states: stateType = {
 	N: "NW",
 };
 
-export const TideDay = (props: { data: tide[] }) => {
+export const TideDay = (props: { data: ITide[] }) => {
 	return (
 		props.data.length > 0 && (
 			<table>
 				<thead>
 					<tr>
-						<th className="table-col-time">Uhrzeit</th>
+						<th style={{ width: "7rem", textAlign: "left" }}>
+							Uhrzeit
+						</th>
 						{props.data[0].height && (
-							<th className="table-col-height">Wasserstand</th>
+							<th style={{ width: "14rem", textAlign: "left" }}>
+								Wasserstand
+							</th>
 						)}
-						<th className="table-col-state">&nbsp;</th>
+						<th>&nbsp;</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -35,7 +39,7 @@ export const TideDay = (props: { data: tide[] }) => {
 									})}
 								</td>
 								{entry.height && (
-									<td>{entry.height.toFixed(2) + "m"}</td>
+									<td>{entry.height.toFixed(2) + " m"}</td>
 								)}
 								<td>{states[entry.state]}</td>
 							</tr>

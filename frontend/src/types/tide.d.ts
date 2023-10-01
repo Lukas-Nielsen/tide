@@ -1,6 +1,6 @@
-export type tides = { [key: string]: tide[] };
+export type ITides = { [key: string]: ITide[] };
 
-export interface tide {
+export interface ITide {
 	state: string;
 	timestamp: string;
 	height?: number;
