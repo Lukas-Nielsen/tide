@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { SelectButton } from "./SelectButton";
 import { displayDays } from "../const/displayDays";
+import { SelectButton } from "@chayns-components/core";
 
 export const DaySelect = (props: { onSelect?: (e: number) => void }) => {
 	const [day, setDay] = useState<number>(7);
@@ -8,16 +8,15 @@ export const DaySelect = (props: { onSelect?: (e: number) => void }) => {
 	return (
 		<SelectButton
 			list={displayDays}
-			listKey="value"
-			listValue="name"
-			quickFind
-			label={
-				displayDays?.find((item) => item.value === day)?.name ||
+			buttonText={
+				displayDays?.find((item) => item.id === day)?.text ||
 				"Tage wählen"
 			}
+			title="Tage wählen"
+			selectedItemIds={[day]}
 			onSelect={(e) => {
-				setDay(e.value);
-				props.onSelect && props.onSelect(e.value);
+				setDay(e[0]);
+				props.onSelect && props.onSelect(e[0]);
 			}}
 		/>
 	);

@@ -1,7 +1,7 @@
 import { setWaitCursor } from "chayns-api";
 import React, { useEffect, useState } from "react";
-import { SelectButton } from "./SelectButton";
 import { ILocation } from "../types/location";
+import { SelectButton, SelectButtonItem } from "@chayns-components/core";
 
 export const LocationSelect = (props: { onSelect?: (e: number) => void }) => {
 	const [data, setData] = useState<ILocation[]>();
@@ -31,17 +31,20 @@ export const LocationSelect = (props: { onSelect?: (e: number) => void }) => {
 
 	return (
 		<SelectButton
-			list={data || []}
-			listKey="id"
-			listValue="name"
-			quickFind
-			label={
+			list={
+				data?.map((e) => {
+					return { id: e.id, text: e.name } as SelectButtonItem;
+				}) || []
+			}
+			shouldShowSearch
+			selectedItemIds={[location]}
+			buttonText={
 				data?.find((entry) => entry.id === location)?.name ||
 				"Ort wählen"
 			}
 			onSelect={(e) => {
-				setLocation(e.id);
-				props.onSelect && props.onSelect(e.id);
+				setLocation(e[0]);
+				props.onSelect && props.onSelect(e[0]);
 			}}
 		/>
 	);

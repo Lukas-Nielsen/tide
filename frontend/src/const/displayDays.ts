@@ -1,56 +1,56 @@
-import { IDisplayDays } from "../types/displayDays";
+import { SelectButtonItem } from "@chayns-components/core";
 
-export const displayDays: IDisplayDays[] = [
+export const displayDays: SelectButtonItem[] = [
 	{
-		name: "1 Tag",
-		value: 1,
+		text: "1 Tag",
+		id: 1,
 	},
 	{
-		name: "2 Tage",
-		value: 2,
+		text: "2 Tage",
+		id: 2,
 	},
 	{
-		name: "3 Tage",
-		value: 3,
+		text: "3 Tage",
+		id: 3,
 	},
 	{
-		name: "4 Tage",
-		value: 4,
+		text: "4 Tage",
+		id: 4,
 	},
 	{
-		name: "5 Tage",
-		value: 5,
+		text: "5 Tage",
+		id: 5,
 	},
 	{
-		name: "6 Tage",
-		value: 6,
+		text: "6 Tage",
+		id: 6,
 	},
 	{
-		name: "1 Woche",
-		value: 7,
+		text: "1 Woche",
+		id: 7,
 	},
 	{
-		name: "8 Tage",
-		value: 8,
+		text: "8 Tage",
+		id: 8,
 	},
 	{
-		name: "9 Tage",
-		value: 9,
+		text: "9 Tage",
+		id: 9,
 	},
 	{
-		name: "10 Tage",
-		value: 10,
+		text: "10 Tage",
+		id: 10,
 	},
 	{
-		name: "2 Wochen",
-		value: 14,
+		text: "2 Wochen",
+		id: 14,
 	},
 	{
-		name: "3 Wochen",
-		value: 21,
+		text: "3 Wochen",
+		id: 21,
 	},
 	{
-		name: "4 Wochen",
-		value: 28,
+		text: "4 Wochen",
+		id: 28,
 	},
 ];
