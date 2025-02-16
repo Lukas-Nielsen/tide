@@ -1,6 +1,8 @@
 name: Build and Deploy to gh pages
 
 on:
+  schedule:
+    - cron: "0 4 1 * *"
   push:
     tags:
       - "v**"
