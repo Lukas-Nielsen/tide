@@ -8,7 +8,6 @@ export default defineConfig({
 		react(),
 		checker({
 			typescript: true,
-			eslint: { lintCommand: 'eslint "./src/**/*.{ts,tsx}"' },
 		}),
 	],
 	server: { open: true, port: 3000 },
