@@ -27,8 +27,8 @@
 		"useTabs": true
 	},
 	"dependencies": {
-		"@chayns-components/core": "^5.0.0-beta.1077",
-		"chayns-api": "^2.2.14",
+		"@chayns-components/core": "^5.0.0-beta.1091",
+		"chayns-api": "^2.2.19",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0"
 	},
