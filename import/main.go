@@ -98,7 +98,7 @@ func getData(year int, id int) ([]string, error) {
 		return []string{}, err
 	}
 	if resp.IsError() {
-		return []string{}, fmt.Errorf(resp.String())
+		return []string{}, fmt.Errorf("%s", resp.String())
 	}
 	return strings.Split(UTF8(resp.String()), "\n"), nil
 }
