@@ -5,6 +5,9 @@ on:
     branches:
       - "dependabot/npm_and_yarn/**"
 
+permissions:
+  contents: write
+
 jobs:
   test-build:
     runs-on: ubuntu-latest
