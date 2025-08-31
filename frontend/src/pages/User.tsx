@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-	Accordion,
-	AccordionGroup,
-	Input,
-	InputSize,
-} from "@chayns-components/core";
+import { Accordion, AccordionGroup } from "@chayns-components/core";
 import { setWaitCursor } from "chayns-api";
 import { ITides } from "../types/tide";
 import { LocationSelect } from "../components/LocationSelect";
