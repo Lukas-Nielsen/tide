@@ -27,9 +27,9 @@
 		"useTabs": true
 	},
 	"dependencies": {
-		"@chayns-components/core": "^5.0.0-beta.1206",
-		"@chayns-components/date": "^5.0.0-beta.1206",
-		"chayns-api": "^2.4.16",
+		"@chayns-components/core": "^5.0.0-beta.1210",
+		"@chayns-components/date": "^5.0.0-beta.1210",
+		"chayns-api": "^2.4.17",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1"
 	},
