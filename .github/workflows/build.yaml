@@ -26,7 +26,7 @@ jobs:
           cache-dependency-path: "**/package-lock.json"
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: "import/go.mod"
           cache-dependency-path: "import/go.sum"
