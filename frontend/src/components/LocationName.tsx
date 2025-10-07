@@ -14,7 +14,8 @@ export const LocationName = (props: { id?: number }) => {
 			})
 			.then((json) => {
 				setData(json);
-			}).catch;
+			})
+			.catch();
 	}, []);
 
 	return data && props.id && data[props.id.toString()].name;

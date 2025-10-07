@@ -26,7 +26,8 @@ export const LocationSelect = (props: { onSelect?: (e: number) => void }) => {
 				}
 				setData(temp);
 			})
-			.finally(() => setLoading(false)).catch;
+			.finally(() => setLoading(false))
+			.catch();
 	}, []);
 
 	return (
@@ -43,8 +44,10 @@ export const LocationSelect = (props: { onSelect?: (e: number) => void }) => {
 				"Ort wählen"
 			}
 			onSelect={(e) => {
-				setLocation(e[0]);
-				props.onSelect && props.onSelect(e[0]);
+				if (typeof e[0] === "number") {
+					setLocation(e[0]);
+					if (props.onSelect) props.onSelect(e[0]);
+				}
 			}}
 		/>
 	);
