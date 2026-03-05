@@ -2,6 +2,7 @@ import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.layer.css";
 import { DatesProvider } from "@mantine/dates";
 import "@mantine/dates/styles.layer.css";
+import { useDocumentTitle } from "@mantine/hooks";
 import "dayjs/locale/da";
 import "dayjs/locale/de";
 import "dayjs/locale/en";
@@ -13,7 +14,10 @@ import { Footer } from "./Footer";
 import "./i18n";
 
 const App = () => {
-	const { i18n } = useTranslation();
+	const { t, i18n } = useTranslation("app");
+
+	useDocumentTitle(t("tidesOf"));
+
 	return (
 		<MantineProvider defaultColorScheme="auto">
 			<DatesProvider
