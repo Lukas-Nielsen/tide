@@ -1,5 +1,6 @@
 import { Table } from "@mantine/core";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ITideDate, States } from "../model/tide";
 
 interface props {
@@ -7,12 +8,13 @@ interface props {
 }
 
 export const TideTable = ({ day }: props) => {
+	const { t, i18n } = useTranslation("app");
 	return (
 		<Table
 			data={{
-				head: ["Uhrzeit", "Wasserstand", ""],
+				head: [t("time"), t("waterlevel"), ""],
 				body: day.items.map((i) => [
-					new Date(i.timestamp).toLocaleTimeString(undefined, {
+					new Date(i.timestamp).toLocaleTimeString(i18n.language, {
 						hour: "numeric",
 						minute: "numeric",
 					}),

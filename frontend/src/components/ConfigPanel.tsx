@@ -1,6 +1,7 @@
 import { Accordion, Grid, NumberInput, Select, Stack } from "@mantine/core";
 import { Calendar } from "@mantine/dates";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface props {
 	locations?: { id: number; name: string }[] | null;
@@ -21,14 +22,15 @@ export const ConfigPanel = ({
 	date,
 	setDate,
 }: props) => {
+	const { t } = useTranslation("app");
 	return (
 		<Accordion.Item value="config">
-			<Accordion.Control>Einstellungen</Accordion.Control>
+			<Accordion.Control>{t("settings")}</Accordion.Control>
 			<Accordion.Panel>
 				<Grid columns={2}>
 					<Grid.Col span={1} component={Stack}>
 						<Select
-							label="Ort"
+							label={t("locationLabel")}
 							data={locations?.map((l) => ({
 								value: l.id.toString(),
 								label: l.name,
@@ -39,7 +41,7 @@ export const ConfigPanel = ({
 							checkIconPosition="right"
 						/>
 						<NumberInput
-							label="Anzahl anzuzeigender Tage"
+							label={t("dayCountDisplayLabel")}
 							value={dayCount}
 							onChange={(e) => setDayCount(Number(e))}
 							min={1}
@@ -55,7 +57,6 @@ export const ConfigPanel = ({
 								selected: d === date,
 								onClick: () => setDate(d),
 							})}
-							locale="de"
 						/>
 					</Grid.Col>
 				</Grid>

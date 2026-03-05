@@ -2,12 +2,13 @@ import { useFetch } from "@hyper-fetch/react";
 import { Accordion, Center, Stack, Title } from "@mantine/core";
 import dayjs from "dayjs";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getLocation, getLocations } from "./api/data";
 import { ConfigPanel } from "./components/ConfigPanel";
 import { TideList } from "./components/TideList";
 
 export const Body = () => {
-	dayjs.locale("de");
+	const { t, i18n } = useTranslation("app");
 
 	const [dayCount, setDayCount] = useState(7);
 	const [location, setLocation] = useState<string>("635");
@@ -21,7 +22,7 @@ export const Body = () => {
 	return (
 		<Center my="xl">
 			<Stack miw="40rem" maw="95vw">
-				<Title ta="center">Gezeiten der deutschen Nordseeküste</Title>
+				<Title ta="center">{t("tidesOf")}</Title>
 
 				<Accordion>
 					<ConfigPanel
@@ -44,7 +45,7 @@ export const Body = () => {
 					</Title>
 				)}
 				{!loading && !data && (
-					<Title order={3}>Fehler beim anzeigen</Title>
+					<Title order={3}>{t("errorDisplay")}</Title>
 				)}
 
 				{!loading && data && (

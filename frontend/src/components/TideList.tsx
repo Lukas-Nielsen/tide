@@ -1,6 +1,7 @@
 import { Accordion } from "@mantine/core";
 import dayjs from "dayjs";
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { TideTable } from "./TideTable";
 
 interface props {
@@ -10,6 +11,7 @@ interface props {
 }
 
 export const TideList = ({ data, date, dayCount }: props) => {
+	const { i18n } = useTranslation();
 	const start = useMemo(() => dayjs(date), [date]);
 
 	return (
@@ -21,7 +23,7 @@ export const TideList = ({ data, date, dayCount }: props) => {
 						<Accordion.Item key={day.date} value={day.date}>
 							<Accordion.Control>
 								{new Date(day.date).toLocaleDateString(
-									undefined,
+									i18n.language,
 									{
 										weekday: "long",
 										year: "numeric",

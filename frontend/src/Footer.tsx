@@ -1,7 +1,10 @@
-import { Anchor, Center, Group, Text } from "@mantine/core";
+import { Anchor, Center, Group, Select, Text } from "@mantine/core";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export const Footer = () => {
+	const { t, i18n } = useTranslation("app");
+
 	return (
 		<Center my="md">
 			<Group justify="space-evenly" miw="40rem" maw="95vw">
@@ -16,7 +19,7 @@ export const Footer = () => {
 					</Anchor>
 				</Text>
 				<Text>
-					Daten von{" "}
+					{t("dataFrom")}{" "}
 					<Anchor
 						target="_blank"
 						href="https://www.bsh.de"
@@ -25,6 +28,17 @@ export const Footer = () => {
 						BSH
 					</Anchor>
 				</Text>
+				<Select
+					data={[
+						{ value: "de", label: "deutsch" },
+						{ value: "da", label: "dansk" },
+						{ value: "en", label: "english" },
+					]}
+					value={i18n.resolvedLanguage}
+					onChange={(e) => i18n.changeLanguage(e || undefined)}
+					searchable
+					checkIconPosition="right"
+				/>
 			</Group>
 		</Center>
 	);
