@@ -1,4 +1,11 @@
-import { Accordion, Grid, NumberInput, Select, Stack } from "@mantine/core";
+import {
+	Accordion,
+	Center,
+	Grid,
+	NumberInput,
+	Select,
+	Stack,
+} from "@mantine/core";
 import { Calendar } from "@mantine/dates";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -28,7 +35,7 @@ export const ConfigPanel = ({
 			<Accordion.Control>{t("settings")}</Accordion.Control>
 			<Accordion.Panel>
 				<Grid columns={2}>
-					<Grid.Col span={1} component={Stack}>
+					<Grid.Col span={{ base: 2, md: 1 }} component={Stack}>
 						<Select
 							label={t("locationLabel")}
 							data={locations?.map((l) => ({
@@ -50,14 +57,16 @@ export const ConfigPanel = ({
 						/>
 					</Grid.Col>
 
-					<Grid.Col span={1}>
-						<Calendar
-							minDate={new Date()}
-							getDayProps={(d) => ({
-								selected: d === date,
-								onClick: () => setDate(d),
-							})}
-						/>
+					<Grid.Col span={{ base: 2, md: 1 }}>
+						<Center>
+							<Calendar
+								minDate={new Date()}
+								getDayProps={(d) => ({
+									selected: d === date,
+									onClick: () => setDate(d),
+								})}
+							/>
+						</Center>
 					</Grid.Col>
 				</Grid>
 			</Accordion.Panel>

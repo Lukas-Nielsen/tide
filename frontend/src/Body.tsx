@@ -8,7 +8,7 @@ import { ConfigPanel } from "./components/ConfigPanel";
 import { TideList } from "./components/TideList";
 
 export const Body = () => {
-	const { t, i18n } = useTranslation("app");
+	const { t } = useTranslation("app");
 
 	const [dayCount, setDayCount] = useState(7);
 	const [location, setLocation] = useState<string>("635");
@@ -21,7 +21,7 @@ export const Body = () => {
 
 	return (
 		<Center my="xl">
-			<Stack miw="40rem" maw="95vw">
+			<Stack miw="20rem" maw="95vw">
 				<Title ta="center">{t("tidesOf")}</Title>
 
 				<Accordion>
@@ -44,6 +44,7 @@ export const Body = () => {
 						}
 					</Title>
 				)}
+
 				{!loading && !data && (
 					<Title order={3}>{t("errorDisplay")}</Title>
 				)}

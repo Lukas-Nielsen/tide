@@ -9,6 +9,7 @@ interface props {
 
 export const TideTable = ({ day }: props) => {
 	const { t, i18n } = useTranslation("app");
+
 	return (
 		<Table
 			data={{
@@ -19,7 +20,7 @@ export const TideTable = ({ day }: props) => {
 						minute: "numeric",
 					}),
 					i.height ? `${i.height.toFixed(2)} m` : "",
-					States[i.state],
+					t(States[i.state]),
 				]),
 			}}
 		/>

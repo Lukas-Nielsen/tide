@@ -12,6 +12,6 @@ export interface ITide {
 export type TState = "H" | "N";
 
 export const States: Record<TState, string> = {
-	H: "Hochwasser",
-	N: "Niedrigwasser",
+	H: "highTide",
+	N: "lowTide",
 };

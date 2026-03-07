@@ -7,7 +7,7 @@ export const Footer = () => {
 
 	return (
 		<Center my="md">
-			<Group justify="space-evenly" miw="40rem" maw="95vw">
+			<Group justify="space-evenly" w="100%">
 				<Text>
 					© {new Date().getFullYear()} by{" "}
 					<Anchor
