@@ -1,6 +1,7 @@
 import { Table } from "@mantine/core";
 import React from "react";
 import { useTranslation } from "react-i18next";
+
 import { ITideDate, States } from "../model/tide";
 
 interface props {

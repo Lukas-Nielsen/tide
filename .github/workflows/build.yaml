@@ -1,48 +1,42 @@
 name: Build and Deploy to gh pages
 
 on:
-  schedule:
-    - cron: "0 4 1 * *"
-  push:
-    tags:
-      - "v**"
+    schedule:
+        - cron: "0 4 1 * *"
+    push:
+        tags:
+            - "v**"
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  build-and-deploy:
-    concurrency: ci-${{ github.ref }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v6
+    build-and-deploy:
+        concurrency: ci-${{ github.ref }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout 🛎️
+              uses: actions/checkout@v6
 
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 18
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+            - uses: voidzero-dev/setup-vp@v1
+              with:
+                  node-version: "lts"
+                  cache: true
+            - run: vp install
+            - run: vp build
 
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: "import/go.mod"
-          cache-dependency-path: "import/go.sum"
+            - name: Setup Go
+              uses: actions/setup-go@v6
+              with:
+                  go-version-file: "import/go.mod"
+                  cache-dependency-path: "import/go.sum"
 
-      - name: build go 🔧
-        working-directory: import
-        run: |
-          go run .
-      
-      - name: build frontend
-        working-directory: frontend
-        run: |
-          CI=false && npm ci
-          npm run build
+            - name: build go 🔧
+              working-directory: import
+              run: |
+                  go run .
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: frontend/build
+            - name: Deploy 🚀
+              uses: JamesIves/github-pages-deploy-action@v4
+              with:
+                  folder: build

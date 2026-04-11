@@ -10,21 +10,13 @@ export const Footer = () => {
 			<Group justify="space-evenly" w="100%">
 				<Text>
 					© {new Date().getFullYear()} by{" "}
-					<Anchor
-						target="_blank"
-						href="https://github.com/Lukas-Nielsen"
-						rel="noreferrer"
-					>
+					<Anchor target="_blank" href="https://github.com/Lukas-Nielsen" rel="noreferrer">
 						Lukas Nielsen
 					</Anchor>
 				</Text>
 				<Text>
 					{t("dataFrom")}{" "}
-					<Anchor
-						target="_blank"
-						href="https://www.bsh.de"
-						rel="noreferrer"
-					>
+					<Anchor target="_blank" href="https://www.bsh.de" rel="noreferrer">
 						BSH
 					</Anchor>
 				</Text>

@@ -1,11 +1,4 @@
-import {
-	Accordion,
-	Center,
-	Grid,
-	NumberInput,
-	Select,
-	Stack,
-} from "@mantine/core";
+import { Accordion, Center, Grid, NumberInput, Select, Stack } from "@mantine/core";
 import { Calendar } from "@mantine/dates";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -20,15 +13,7 @@ interface props {
 	setDate: (v: string) => void;
 }
 
-export const ConfigPanel = ({
-	locations,
-	location,
-	setLocation,
-	dayCount,
-	setDayCount,
-	date,
-	setDate,
-}: props) => {
+export const ConfigPanel = ({ locations, location, setLocation, dayCount, setDayCount, date, setDate }: props) => {
 	const { t } = useTranslation("app");
 	return (
 		<Accordion.Item value="config">

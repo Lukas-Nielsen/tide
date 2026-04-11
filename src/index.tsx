@@ -9,6 +9,7 @@ import "dayjs/locale/en";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { useTranslation } from "react-i18next";
+
 import { Body } from "./Body";
 import { Footer } from "./Footer";
 import "./i18n";

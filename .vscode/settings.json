@@ -1,0 +1,20 @@
+{
+	"i18n-ally.localesPaths": ["frontend/public/locales"],
+	"i18n-ally.keystyle": "nested",
+	"i18n-ally.displayLanguage": "en",
+	"i18n-ally.extract.keygenStyle": "camelCase",
+	"i18n-ally.extract.targetPickingStrategy": "most-similar-by-key",
+	"i18n-ally.extract.autoDetect": true,
+	"i18n-ally.namespace": true,
+	"i18n-ally.enabledFrameworks": ["react-i18next", "react", "i18next"],
+	"i18n-ally.tabStyle": "tab",
+	"i18n-ally.indent": 4,
+	"i18n-ally.sortKeys": true,
+	"editor.defaultFormatter": "oxc.oxc-vscode",
+	"oxc.fmt.configPath": "./vite.config.ts",
+	"editor.formatOnSave": true,
+	"editor.formatOnSaveMode": "file",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.oxc": "explicit"
+	}
+}

@@ -1,4 +1,5 @@
-frontend/node_modules
-frontend/build
-frontend/public/data
-.vscode
+public/data
+node_modules
+build
+dev-dist
+.pnpm-store

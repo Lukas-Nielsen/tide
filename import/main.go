@@ -25,7 +25,7 @@ const (
 	FILE_TIME       = "15:04"
 	TIMEZONE_OFFSET = "+01:00"
 	BASE_URL        = "https://filebox.bsh.de/index.php/s/SbJ3z5NBkpOZloY/download?path=%2Fvb_hwnw%2Fdeu"
-	OUT_ROOT        = "../frontend/public/data"
+	OUT_ROOT        = "../public/data"
 )
 
 func main() {
