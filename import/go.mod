@@ -1,12 +1,10 @@
 module tide-backend
 
-go 1.24.0
-
-toolchain go1.24.1
+go 1.25.0
 
 require github.com/go-resty/resty/v2 v2.17.2
 
 require (
-	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/text v0.34.0
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/text v0.37.0
 )
