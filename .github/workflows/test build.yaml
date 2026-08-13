@@ -20,6 +20,10 @@ jobs:
         with:
           node-version: "lts"
           cache: true
-      - run: vp i --frozen-lockfile
+      - name: Clean install dependencies
+        run: |
+          rm -rf node_modules
+          rm -rf pnpm-lock.yaml
+          vp i
       - run: vp check
       - run: vp build
