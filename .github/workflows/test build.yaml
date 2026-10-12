@@ -1,29 +1,29 @@
 name: test build
 
 on:
-  push:
-    branches:
-      - main
-      - "dependabot/npm_and_yarn**"
+    push:
+        branches:
+            - main
+            - "dependabot/npm_and_yarn**"
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  test-build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v6
+    test-build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout 🛎️
+              uses: actions/checkout@v6
 
-      - uses: voidzero-dev/setup-vp@v1
-        with:
-          node-version: "lts"
-          cache: true
-      - name: Clean install dependencies
-        run: |
-          rm -rf node_modules
-          rm -rf pnpm-lock.yaml
-          vp i
-      - run: vp check
-      - run: vp build
+            - uses: voidzero-dev/setup-vp@v1.21.1
+              with:
+                  node-version: "lts"
+                  cache: true
+            - name: Clean install dependencies
+              run: |
+                  rm -rf node_modules
+                  rm -rf pnpm-lock.yaml
+                  vp i
+            - run: vp check
+            - run: vp build
