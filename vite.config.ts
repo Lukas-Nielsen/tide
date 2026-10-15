@@ -1,6 +1,6 @@
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite-plus";
 import { oxfmt, oxlint } from "oxc-config-mantine";
+import { defineConfig } from "vite-plus";
 
 export default defineConfig({
 	staged: {

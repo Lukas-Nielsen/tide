@@ -1,6 +1,6 @@
-import { Anchor, Center, Group, Select, Text } from "@mantine/core";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { Anchor, Center, Group, Select, Text } from "@mantine/core";
 
 export const Footer = () => {
 	const { t, i18n } = useTranslation("app");

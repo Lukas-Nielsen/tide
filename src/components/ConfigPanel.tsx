@@ -1,7 +1,7 @@
-import { Accordion, Center, Grid, NumberInput, Select, Stack } from "@mantine/core";
-import { Calendar } from "@mantine/dates";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { Accordion, Center, Grid, NumberInput, Select, Stack } from "@mantine/core";
+import { Calendar } from "@mantine/dates";
 
 interface props {
 	locations?: { id: number; name: string }[] | null;

@@ -1,9 +1,8 @@
-import { useFetch } from "@hyper-fetch/react";
-import { Accordion, Center, Stack, Title } from "@mantine/core";
 import dayjs from "dayjs";
 import React, { useState } from "react";
+import { useFetch } from "@hyper-fetch/react";
 import { useTranslation } from "react-i18next";
-
+import { Accordion, Center, Stack, Title } from "@mantine/core";
 import { getLocation, getLocations } from "./api/data";
 import { ConfigPanel } from "./components/ConfigPanel";
 import { TideList } from "./components/TideList";

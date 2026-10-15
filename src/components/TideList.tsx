@@ -1,8 +1,7 @@
-import { Accordion } from "@mantine/core";
 import dayjs from "dayjs";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-
+import { Accordion } from "@mantine/core";
 import { TideTable } from "./TideTable";
 
 interface props {
